@@ -1,0 +1,21 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/NiekRoelofs/Project2.4G1/1.0.0
+info:
+  version: 1.0.0
+  title: Bank
+  description: 'Bank API for project 2.4'
+paths: 
+  /example:
+    get:
+      tags:
+        - example
+      summary: example
+      operationId: example
+      description: example
+      responses:
+        '200': 
+          description: example
+        
