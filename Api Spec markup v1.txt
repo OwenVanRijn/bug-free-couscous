@@ -1,0 +1,85 @@
+/api/transactions GET POST
+/api/user (USER) GET   (EMPLOYEE) POST PUT DELETE
+/api/bankaccount (USER) GET (default: user id, param id)   (EMPLOYEE) POST (create)  PUT (deposit/withdraw)
+
+/api/transactions GET {id} {
+	"id: "",
+	"Type": [Transaction, Deposit, Withdraw]
+	"Timestamp": "",
+	"IBAN from": "",
+	"IBAN to": "",
+	"Performed by": {
+		"Name": "",
+		"Role": "",
+	},
+	"Amount": "",
+}
+
+/api/transactions POST {IBAN from, IBAN to, Amount} { // Sends back status code. Takes user info from current auth
+}
+
+/api/user GET {id: optional, taken from auth otherwise} {
+	"id": "",
+	"FirstName": "",
+	"LastName": "",
+	"Email": "",
+	"PhoneNumber": "",
+	"Address": "",
+	"Role": "",
+	"Bankaccounts": {
+		"account1": {
+			"id": "",
+			"Type": [Current, Savings],
+			"IBAN": "",
+			"Amount": ""
+		}
+	},
+	"Limits": {
+		"Day limit": {
+			"Limit": "",
+			"Current": "",
+		},
+		"Transaction limit": {
+			"Limit": "",
+			"Current": "",
+		},
+	}
+}
+
+// Employee only
+/api/user POST {FirstName, LastName, Email: optional, PhoneNumber: optional, Address} { // Sends back status code
+}
+
+// User can edit Email, PhoneNumber, Address. Employee can edit all
+/api/user PUT {id, [editable fields]} { // Sends back status code
+}
+
+// Employee only
+/api/user DELETE {id} { // Sends back status code
+}
+
+/api/bankaccount GET {id} {
+	"id": "",
+	"Type": [Current, Savings],
+	"IBAN": "",
+	"Amount": "",
+	"Transactions": [
+		{
+			[take /api/transactions GET]
+		}
+	],
+	"Limits": {
+		"Absolute Limit": {
+			"Limit": "",
+			"Current": "",
+		}
+	}
+}
+
+// Employee only
+/api/bankaccount POST {Type} { // Sends back status code
+}
+
+// Employee only
+/api/bankaccount PUT {IBAN, Type [Deposit, Withdraw], Amount} { // Sends back status code
+}
