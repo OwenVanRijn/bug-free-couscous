@@ -18,4 +18,154 @@ paths:
       responses:
         '200': 
           description: example
-        
+  /api/user/{id}: #id is needed for employee on GET, PUT and DELETE
+    get:
+      tags:
+        - user
+      summary: Get user information
+      operationId: getUser
+      description: Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email,
+                    phone number, address, role, bankaccounts and limits.
+      responses: 
+        '200':
+          description: User data
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - user
+      summary: Edit the user information
+      operationId: editUser
+      requestBody:
+        description: The client can edit their email, phone number and address. The employee can edit all User information.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Edited User
+          content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - user
+      summary: Delete a User
+      operationId: deleteUser
+      responses:
+        '200':
+          description: User has been deleted
+    post:
+      tags:
+        - user
+      summary: Create a User
+      operationId: createUser
+      requestBody:
+        description: The employee can create a User while entering all required fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Created User
+          content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      required:
+       - id
+       - FirstName
+       - LastName
+       - Email
+       - PhoneNumber
+       - Address
+       - Role
+       - BankAccounts
+       - Limits
+      properties:
+        id:
+          type: integer
+        FirstName: 
+          type: string
+        LastName:
+          type: string
+        Email:
+          type: string
+        PhoneNumber:
+          type: string
+        Address:
+          $ref: '#/components/schemas/Address'
+        Role:
+          type: enum #check enum
+        BankAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankAccount'
+        Limits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Limit'
+    Address:
+      type: object
+      required:
+       - street
+       - houseNumber
+       - postalcode
+       - city
+       - country
+      properties:
+        street:
+          type: string
+        houseNumber:
+          type: integer
+        postalcode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+    BankAccount:
+      type: object
+      required:
+       - name
+       - id
+       - accountType
+       - IBAN
+       - amount
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+        accountType:
+          type: enum #check enum nog
+        IBAN:
+          type: string
+        amount:
+          type: number
+    Limit:
+      type: object
+      required:
+       - name
+       - limit
+       - current
+      properties:
+        name:
+          type: string
+        limit:
+          type: number
+        current:
+          type: number
+
+
