@@ -79,6 +79,58 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+
+  /transaction:
+    get:
+      tags: [transactions]
+      operationId: getTransaction
+      summary: Get details of a transaction
+      description: Get details of a transaction returned as a JSON. requires a transaction id
+      responses:
+        '200':
+          description: Successfully queried transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Transaction"  
+                  
+      parameters: 
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          
+          
+    post:
+      tags: [transactions]
+      operationId: makeTransaction
+      summary: Create a transaction
+      description: Creates a transaction from one IBAN to another. Source iban needs to be from customer unless an employee creates a transaction
+      responses:
+        '200':
+          description: Successfully added a transaction
+          
+      parameters: 
+        - in: query
+          name: IBAN_from
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: IBAN_to
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: amount
+          schema:
+            type: number
+          required: true
+
+        
 components:
   schemas:
     User:
@@ -168,4 +220,49 @@ components:
         current:
           type: number
 
+    Transaction:
+      type: object
+      required:
+        - id
+        - type 
+        - timestamp
+        - IBAN_from
+        - IBAN_to
+        - performed_by
+        - amount
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          example: 10
+        type:
+          type: string
+          enum: [Transaction, Deposit, Withdraw]
+          example: "Transaction"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2015-07-20T15:49:04-07:00"
+        IBAN_from:
+          type: string
+          example: "IBAN01"
+        IBAN_to:
+          type: string
+          example: "IBAN02"
+        performed_by:
+          type: object
+          required: 
+            - name
+            - role
+          properties:
+            name:
+              type: string
+              example: "Owen"
+            role:
+              type: string
+              enum: [Customer, Employee]
+              example: "Customer"
+        amount:
+          type: number
+          example: 10
 
