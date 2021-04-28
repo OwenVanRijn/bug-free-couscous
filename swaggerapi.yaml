@@ -18,7 +18,7 @@ paths:
       responses:
         '200': 
           description: example
-  /api/user/{id}: #id is needed for employee on GET, PUT and DELETE
+  /api/user?id=id: #id is needed for employee on GET, PUT and DELETE
     get:
       tags:
         - user
@@ -26,6 +26,12 @@ paths:
       operationId: getUser
       description: Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email,
                     phone number, address, role, bankaccounts and limits.
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: Account id
       responses: 
         '200':
           description: User data
@@ -39,7 +45,7 @@ paths:
       summary: Edit the user information
       operationId: editUser
       requestBody:
-        description: The client can edit their email, phone number and address. The employee can edit all User information.
+        description: The customer can edit their email, phone number and address. The employee can edit all User information.
         required: true
         content:
           application/json:
@@ -214,18 +220,25 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         FirstName: 
           type: string
+          example: "James"
         LastName:
           type: string
+          example: "Ford"
         Email:
           type: string
+          exampe: "james@email.com"
         PhoneNumber:
           type: string
+          example: "+31 6 12345678"
         Address:
           $ref: '#/components/schemas/Address'
         Role:
-          type: enum #check enum
+          type: string
+          enum: [Customer, Employee]
+          example: "Customer"
         BankAccounts:
           type: array
           items:
@@ -245,14 +258,19 @@ components:
       properties:
         street:
           type: string
+          example: "Long Road"
         houseNumber:
           type: integer
+          example: 10
         postalcode:
           type: string
+          example: "1234AB"
         city:
           type: string
+          example: "Big City"
         country:
           type: string
+          example: "Wakanda"
     BankAccount:
       type: object
       required:
@@ -264,14 +282,20 @@ components:
       properties:
         name:
           type: string
+          example: "Daily Account"
         id:
           type: integer
+          example: 1
         accountType:
-          type: enum #check enum nog
+          type: string
+          enum: [Current, Savings]
+          example: "Current"
         IBAN:
           type: string
+          example: NL20RABO124235346
         amount:
           type: number
+          example: 1200
     Limit:
       type: object
       required:
@@ -281,10 +305,13 @@ components:
       properties:
         name:
           type: string
+          example: "AbsoluteLimit"
         limit:
           type: number
+          example: 1000
         current:
           type: number
+          example: 100
     CreateBankaccount:
       type: object
       required:
