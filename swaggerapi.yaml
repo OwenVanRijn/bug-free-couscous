@@ -77,7 +77,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              type: object
+              required:
+                - FirstName
+                - LastName
+                - Email
+                - PhoneNumber
+                - Address
+              properties:
+                FirstName: 
+                  type: string
+                  example: "James"
+                LastName:
+                  type: string
+                  example: "Ford"
+                Email:
+                  type: string
+                  example: "james@email.com"
+                PhoneNumber:
+                  type: string
+                  example: "+31 6 12345678"
+                Address:
+                  $ref: '#/components/schemas/Address'
       responses:
         '200':
           description: Created User
@@ -310,7 +331,7 @@ components:
           example: 1000
         current:
           type: number
-          example: 100
+          example: 0
     CreateBankaccount:
       type: object
       required:
