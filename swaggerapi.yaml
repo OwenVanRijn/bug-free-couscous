@@ -112,23 +112,31 @@ paths:
       responses:
         '200':
           description: Successfully added a transaction
-          
-      parameters: 
-        - in: query
-          name: IBAN_from
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: IBAN_to
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: amount
-          schema:
-            type: number
-          required: true
+
+      requestBody:
+        description: argument fields
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+                - IBAN_from
+                - IBAN_to
+                - amount
+                
+              properties:
+                IBAN_from:
+                  type: string
+                  example: "IBAN01"
+                IBAN_to:
+                  type: string
+                  example: "IBAN02"
+                amount:
+                  type: number
+                  example: 10.50
+
+                
   '/Bankaccount/{id}':
     get:
       tags:
