@@ -129,7 +129,65 @@ paths:
           schema:
             type: number
           required: true
-
+  '/Bankaccount/{id}':
+    get:
+      tags:
+        - Bankaccount
+      summary: Get bankaccount information
+      operationId: getBankaccount
+      description: Calling this allows you to get all your bankaccount information based on the id
+      parameters:
+        - name: id
+          in: path
+          description: ID of bankaccount to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: operation succesful
+        '400':
+          description: bad input parameter
+        '404':
+          description: bankaccount not found
+  /Bankaccount:
+    post:
+      tags:
+        - Bankaccount
+      summary: create a bankaccount
+      operationId: createBankaccount
+      requestBody:
+        description: Create a bankaccount, this option is employee only
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankaccount'
+      responses:
+        '200':
+          description: operation succesful
+        '400':
+          description: bad input parameter
+    put:
+      tags:
+        - Bankaccount
+      summary: make the money flows happen
+      operationId: completeMoneyFlow
+      requestBody:
+        description: Complete a deposit or withdraw as an employee
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankaccountMoneyFlow'
+      responses:
+        '200':
+          description: operation succesful
+        '400':
+          description: bad input parameter
+        '404':
+          description: IBAN not found
         
 components:
   schemas:
@@ -219,7 +277,27 @@ components:
           type: number
         current:
           type: number
-
+    CreateBankaccount:
+      type: object
+      required:
+        - Type
+      properties:
+        Type:
+          type: string
+          enum: [Current, Savings]
+    BankaccountMoneyFlow:
+      type: object
+      required:
+        - IBAN
+        - Type
+        - Amount
+      properties:
+        IBAN:
+          type: string
+        Type:
+          type: string
+        Amount:
+          type: integer
     Transaction:
       type: object
       required:
