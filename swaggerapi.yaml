@@ -143,7 +143,7 @@ paths:
                   example: 10.50
 
                 
-  '/Bankaccount/{id}':
+  '/Bankaccount':
     get:
       tags:
         - Bankaccount
@@ -152,7 +152,7 @@ paths:
       description: Calling this allows you to get all your bankaccount information based on the id
       parameters:
         - name: id
-          in: path
+          in: query
           description: ID of bankaccount to return
           required: true
           schema:
@@ -165,7 +165,6 @@ paths:
           description: bad input parameter
         '404':
           description: bankaccount not found
-  /Bankaccount:
     post:
       tags:
         - Bankaccount
