@@ -13,12 +13,10 @@ tags:
   - name: Customers
     description: Operations for the customers
   - name: Auth
-    descpiption: Authentication
+    description: Authentication
 paths:
   /login:
     post:
-      security:
-        - ApiKeyAuth: []
       tags:
         - Auth
       summary: Login
@@ -42,7 +40,7 @@ paths:
   /users/{id}: 
     get:
       tags:
-        - Employee
+        - Employees
       summary: Get user information
       operationId: getUser
       description: Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email,
@@ -69,9 +67,16 @@ paths:
           description: Forbidden
     put:
       tags:
-        - Employee
+        - Employees
       summary: Edit the user information
       operationId: editUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The user id
       requestBody:
         description: The Employee can edit all User information. 
         required: true
@@ -94,10 +99,17 @@ paths:
           description: Forbidden
     delete:
       tags:
-        - Employee
+        - Employees
       summary: Delete a User by id
       operationId: deleteUser
       description: The Employee can delete a User with the User Id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The user id
       responses:
         '200':
           description: User has been deleted
@@ -341,7 +353,7 @@ components:
           type: string
           example: "Username"
         password:
-          type: password
+          type: string
           example: "Password"
     User:
       type: object
@@ -516,7 +528,6 @@ components:
         amount:
           type: number
           example: 10
-<<<<<<< Updated upstream
     TransactionEdit:
       type: object
       properties:
@@ -546,7 +557,6 @@ components:
         amount:
           type: number
           example: 10
-=======
     CreateUser:
       type: object
       required:
@@ -631,4 +641,3 @@ components:
           example: "+31 6 12345678"
         Address:
           $ref: '#/components/schemas/Address'
->>>>>>> Stashed changes
