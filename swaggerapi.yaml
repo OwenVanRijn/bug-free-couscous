@@ -39,7 +39,7 @@ paths:
                 example: e.g. abc123-123abc-acb123
         '401':
           description: Failed to login
-  /user/{id}: 
+  /users/{id}: 
     get:
       tags:
         - Employee
@@ -61,18 +61,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized action
+        '403':
+          description: Forbidden
     put:
       tags:
-        - user
+        - Employee
       summary: Edit the user information
       operationId: editUser
       requestBody:
-        description: The customer can edit their email, phone number and address. The employee can edit all User information.
+        description: The Employee can edit all User information. 
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/EmployeeUserPut'
       responses:
         '200':
           description: Edited User
@@ -80,47 +86,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized action
+        '403':
+          description: Forbidden
     delete:
       tags:
-        - user
-      summary: Delete a User
+        - Employee
+      summary: Delete a User by id
       operationId: deleteUser
+      description: The Employee can delete a User with the User Id.
       responses:
         '200':
           description: User has been deleted
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized action
+        '403':
+          description: Forbidden
+  /users:
     post:
       tags:
-        - user
-      summary: Create a User
+        - Employees
+      summary: Create a new bank User
       operationId: createUser
+      description: The Employee can create a new User with the requested body.
       requestBody:
-        description: The employee can create a User while entering all required fields.
+        description: The CreateUser object only has the fields required to create a User.
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - FirstName
-                - LastName
-                - Email
-                - PhoneNumber
-                - Address
-              properties:
-                FirstName: 
-                  type: string
-                  example: "James"
-                LastName:
-                  type: string
-                  example: "Ford"
-                Email:
-                  type: string
-                  example: "james@email.com"
-                PhoneNumber:
-                  type: string
-                  example: "+31 6 12345678"
-                Address:
-                  $ref: '#/components/schemas/Address'
+              $ref: '#/components/schemas/CreateUser'
       responses:
         '200':
           description: Created User
@@ -128,7 +128,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized action
+        '403':
+          description: Forbidden
+    get:
+      tags:
+        - Employees
+      summary: Get a list of Users
+      operationId: getUsers
+      description: The Employee can get a list of all Users
+      responses:
+        '200':
+          description: Array of all bank users
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/User'
   /transaction:
     get:
       tags: [Customer, Employee]
@@ -496,6 +516,7 @@ components:
         amount:
           type: number
           example: 10
+<<<<<<< Updated upstream
     TransactionEdit:
       type: object
       properties:
@@ -525,3 +546,89 @@ components:
         amount:
           type: number
           example: 10
+=======
+    CreateUser:
+      type: object
+      required:
+        - FirstName
+        - LastName
+        - Email
+        - PhoneNumber
+        - Address
+      properties:
+        FirstName: 
+          type: string
+          example: "James"
+        LastName:
+          type: string
+          example: "Ford"
+        Email:
+          type: string
+          example: "james@email.com"
+        PhoneNumber:
+          type: string
+          example: "+31 6 12345678"
+        Address:
+          $ref: '#/components/schemas/Address'
+    EmployeeUserPut:
+      type: object
+      required:
+       - FirstName
+       - LastName
+       - Email
+       - PhoneNumber
+       - Address
+       - Role
+       - BankAccounts
+       - Limits
+      properties:
+        FirstName: 
+          type: string
+          example: "James"
+        LastName:
+          type: string
+          example: "Ford"
+        Email:
+          type: string
+          example: "james@email.com"
+        PhoneNumber:
+          type: string
+          example: "+31 6 12345678"
+        Address:
+          $ref: '#/components/schemas/Address'
+        Role:
+          type: string
+          enum: [Customer, Employee]
+          example: "Customer"
+        BankAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankAccount'
+        Limits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Limit'
+    CustomerUserPut:
+      type: object
+      required:
+       - FirstName
+       - LastName
+       - Email
+       - PhoneNumber
+       - Address
+      properties:
+        FirstName: 
+          type: string
+          example: "James"
+        LastName:
+          type: string
+          example: "Ford"
+        Email:
+          type: string
+          example: "james@email.com"
+        PhoneNumber:
+          type: string
+          example: "+31 6 12345678"
+        Address:
+          $ref: '#/components/schemas/Address'
+>>>>>>> Stashed changes
