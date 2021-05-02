@@ -131,17 +131,17 @@ paths:
 
   /transaction:
     get:
-      tags: [transactions]
+      tags: [Customer, Employee]
       operationId: getTransaction
-      summary: Get details of a transaction
-      description: Get details of a transaction returned as a JSON. requires a transaction id
+      summary: Get details of recent transactions
+      description: Get details of transactions sorted by date returned as a JSON. Can take transaction ids, ibans, limit and page as filters. Customers can only query from ibans or ids they have access to. Employees can query any id or iban. When no filters are provided, Customers get all recent transactions done from ibans they have access to, Employees get all recent transactions
       responses:
         '200':
           description: Successfully queried transaction
           content:
             application/json:
               schema:
-                type: object
+                type: array
                 items:
                   $ref: "#/components/schemas/Transaction"  
                   
@@ -149,15 +149,36 @@ paths:
         - in: query
           name: id
           schema:
+            type: array
+            items:
+              type: integer
+          required: false
+        - in: query
+          name: IBAN
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
+        - in: query
+          name: limit
+          schema:
             type: integer
-          required: true
+            default: 50
+          required: false
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          required: false
           
           
     post:
-      tags: [transactions]
-      operationId: makeTransaction
+      tags: [Customer, Employee]
+      operationId: createTransaction
       summary: Create a transaction
-      description: Creates a transaction from one IBAN to another. Source iban needs to be from customer unless an employee creates a transaction
+      description: Creates a transaction from one IBAN to another. Source iban needs to be from customer unless an employee creates the transaction
       responses:
         '200':
           description: Successfully added a transaction
@@ -185,6 +206,49 @@ paths:
                   type: number
                   example: 10.50
 
+  /transaction/{id}:
+    put:
+      tags: [Employee]
+      operationId: editTransaction
+      summary: Edit a transaction
+      description: Edits a transaction based on the provided information in the json sent. Updates the money sent on both IBAN's
+      responses:
+        '200':
+          description: Successfully edited transaction
+          
+      requestBody:
+        description: editable fields
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: "#/components/schemas/TransactionEdit"  
+      
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            example: 1
+          required: true
+          
+    delete:
+      tags: [Employee]
+      operationId: deleteTransaction
+      summary: Delete a transaction
+      description: Deletes the specified transaction. Undo's the money transfered to said account
+      responses:
+        '200':
+          description: Successfully deleted transaction
+      
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            example: 1
+          required: true
                 
   '/Bankaccount':
     get:
@@ -432,4 +496,32 @@ components:
         amount:
           type: number
           example: 10
-
+    TransactionEdit:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [Transaction, Deposit, Withdraw]
+          example: "Transaction"
+        IBAN_from:
+          type: string
+          example: "IBAN01"
+        IBAN_to:
+          type: string
+          example: "IBAN02"
+        performed_by:
+          type: object
+          required: 
+            - name
+            - role
+          properties:
+            name:
+              type: string
+              example: "Owen"
+            role:
+              type: string
+              enum: [Customer, Employee]
+              example: "Customer"
+        amount:
+          type: number
+          example: 10
