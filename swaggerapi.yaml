@@ -7,31 +7,53 @@ info:
   version: 1.0.0
   title: Bank
   description: 'Bank API for project 2.4'
-paths: 
-  /example:
-    get:
+tags: 
+  - name: Employees
+    description: Operations for the employees
+  - name: Customers
+    description: Operations for the customers
+  - name: Auth
+    descpiption: Authentication
+paths:
+  /login:
+    post:
+      security:
+        - ApiKeyAuth: []
       tags:
-        - example
-      summary: example
-      operationId: example
-      description: example
+        - Auth
+      summary: Login
+      operationId: login
+      description: Verifies the user by login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
       responses:
-        '200': 
-          description: example
-  /api/user: 
+        '200':
+          description: Returns a token
+          content:
+            application/json:
+              schema:
+                type: string
+                example: e.g. abc123-123abc-acb123
+        '401':
+          description: Failed to login
+  /user/{id}: 
     get:
       tags:
-        - user
+        - Employee
       summary: Get user information
       operationId: getUser
       description: Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email,
                     phone number, address, role, bankaccounts and limits.
       parameters:
-        - in: query
+        - in: path
           name: id
+          required: true
           schema:
             type: integer
-          description: Account id
+          description: The user id
       responses: 
         '200':
           description: User data
@@ -225,6 +247,18 @@ paths:
         
 components:
   schemas:
+    Login:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "Username"
+        password:
+          type: password
+          example: "Password"
     User:
       type: object
       required:
