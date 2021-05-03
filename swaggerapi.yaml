@@ -41,7 +41,7 @@ paths:
     get:
       tags:
         - Employees
-      summary: Get user information
+      summary: Get a single User
       operationId: getUser
       description: Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email,
                     phone number, address, role, bankaccounts and limits.
@@ -68,7 +68,7 @@ paths:
     put:
       tags:
         - Employees
-      summary: Edit the user information
+      summary: Edit the User information
       operationId: editUser
       parameters:
         - in: path
@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EmployeeUserPut'
+              $ref: '#/components/schemas/EmployeeUserUpdate'
       responses:
         '200':
           description: Edited User
@@ -149,18 +149,38 @@ paths:
     get:
       tags:
         - Employees
+        - Customers
       summary: Get a list of Users
       operationId: getUsers
-      description: The Employee can get a list of all Users
+      description: The Employee can get a list of all Users, the Customer gets their own account information
       responses:
         '200':
           description: Array of all bank users
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/User'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - Customers
+      summary: Edit the User information
+      operationId: editUserCustomer
+      requestBody:
+        description: The Employee can edit all User information. 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUserUpdate'
+      responses:
+        '200':
+          description: Edited User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
   /transaction:
     get:
       tags: [Customers, Employees]
@@ -355,7 +375,7 @@ paths:
       summary: create a bankaccount
       operationId: createBankaccount
       requestBody:
-          description: Create a bankaccount, this option is employee only
+        description: Create a bankaccount, this option is employee only
         required: true
         content:
           application/json:
@@ -630,17 +650,8 @@ components:
           example: "+31 6 12345678"
         Address:
           $ref: '#/components/schemas/Address'
-    EmployeeUserPut:
+    EmployeeUserUpdate:
       type: object
-      required:
-       - FirstName
-       - LastName
-       - Email
-       - PhoneNumber
-       - Address
-       - Role
-       - BankAccounts
-       - Limits
       properties:
         FirstName: 
           type: string
@@ -668,21 +679,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Limit'
-    CustomerUserPut:
+    CustomerUserUpdate:
       type: object
-      required:
-       - FirstName
-       - LastName
-       - Email
-       - PhoneNumber
-       - Address
       properties:
-        FirstName: 
-          type: string
-          example: "James"
-        LastName:
-          type: string
-          example: "Ford"
         Email:
           type: string
           example: "james@email.com"
