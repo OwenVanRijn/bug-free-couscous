@@ -154,6 +154,19 @@ paths:
       summary: Get a list of Users
       operationId: getUsers
       description: The Employee can get a list of all Users, the Customer gets their own account information
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to
+                       collect the result set
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            maximum: 50
+          description: The numbers of items to return
       responses:
         '200':
           description: Array of all bank users
