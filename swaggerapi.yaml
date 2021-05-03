@@ -163,7 +163,7 @@ paths:
                     $ref: '#/components/schemas/User'
   /transaction:
     get:
-      tags: [Customer, Employee]
+      tags: [Customers, Employees]
       operationId: getTransaction
       summary: Get details of recent transactions
       description: Get details of transactions sorted by date returned as a JSON. Can take transaction ids, ibans, limit and page as filters. Customers can only query from ibans or ids they have access to. Employees can query any id or iban. When no filters are provided, Customers get all recent transactions done from ibans they have access to, Employees get all recent transactions
@@ -207,7 +207,7 @@ paths:
           
           
     post:
-      tags: [Customer, Employee]
+      tags: [Customers, Employees]
       operationId: createTransaction
       summary: Create a transaction
       description: Creates a transaction from one IBAN to another. Source iban needs to be from customer unless an employee creates the transaction
@@ -240,7 +240,7 @@ paths:
 
   /transaction/{id}:
     put:
-      tags: [Employee]
+      tags: [Employees]
       operationId: editTransaction
       summary: Edit a transaction
       description: Edits a transaction based on the provided information in the json sent. Updates the money sent on both IBAN's
@@ -266,7 +266,7 @@ paths:
           required: true
           
     delete:
-      tags: [Employee]
+      tags: [Employees]
       operationId: deleteTransaction
       summary: Delete a transaction
       description: Deletes the specified transaction. Undo's the money transfered to said account
