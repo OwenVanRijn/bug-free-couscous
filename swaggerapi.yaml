@@ -17,6 +17,7 @@ tags:
 paths:
   /login:
     post:
+      security: []
       tags:
         - Auth
       summary: Login
@@ -407,6 +408,11 @@ paths:
           description: IBAN not found
         
 components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
   schemas:
     Login:
       type: object
@@ -690,3 +696,6 @@ components:
           example: "+31 6 12345678"
         Address:
           $ref: '#/components/schemas/Address'
+
+security:
+  - bearerAuth: []         # use the same name as above
