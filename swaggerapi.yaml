@@ -335,6 +335,12 @@ paths:
       responses:
         '200':
           description: operation succesful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BankAccount"
         '400':
           description: bad input parameter
         '404':
@@ -398,6 +404,12 @@ paths:
       responses:
         '200':
           description: operation succesful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreateBankaccountSchema"
         '400':
           description: bad input parameter
     put:
@@ -415,6 +427,12 @@ paths:
       responses:
         '200':
           description: operation succesful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepositOrWithdraw"
         '400':
           description: bad input parameter
         '404':
@@ -513,6 +531,7 @@ components:
        - accountType
        - IBAN
        - amount
+       - transactions
       properties:
         name:
           type: string
@@ -530,6 +549,10 @@ components:
         amount:
           type: number
           example: 1200
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
     Limit:
       type: object
       required:
@@ -549,12 +572,37 @@ components:
     CreateBankaccount:
       type: object
       required:
-        - Type
+        - accountType
+        - name
       properties:
-        Type:
+        name:
+          type: string
+          example: "Daily Account"
+        accountType:
           type: string
           enum: [Current, Savings]
-          example: Current
+          example: "Current"
+    CreateBankaccountSchema:
+      type: object
+      required:
+        - Type
+      properties:
+        name:
+          type: string
+          example: "Daily Account"
+        id:
+          type: integer
+          example: 1
+        accountType:
+          type: string
+          enum: [ Current, Savings ]
+          example: "Current"
+        IBAN:
+          type: string
+          example: NL20RABO124235346
+        amount:
+          type: number
+          example: 1200
     DepositOrWithdraw:
       type: object
       required:
@@ -567,7 +615,8 @@ components:
           example: NLxxINHO0xxxxxxxxx
         Type:
           type: string
-          example: Current
+          example: Deposit
+          enum: [Deposit, Withdraw]
         Amount:
           type: integer
           example: 2000
