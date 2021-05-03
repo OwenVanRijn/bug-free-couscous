@@ -282,21 +282,22 @@ paths:
             example: 1
           required: true
                 
-  '/Bankaccount':
+  /Bankaccount/{IBAN}:
     get:
       tags:
-        - Bankaccount
+        - Employees
+        - Customers
       summary: Get bankaccount information
       operationId: getBankaccount
       description: Calling this allows you to get all your bankaccount information based on the id
       parameters:
-        - name: id
-          in: query
-          description: ID of bankaccount to return
+        - name: IBAN
+          in: path
+          description: IBAN of bankaccount to return
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            example: NLxxINHO0xxxxxxxxx
       responses:
         '200':
           description: operation succesful
@@ -304,13 +305,57 @@ paths:
           description: bad input parameter
         '404':
           description: bankaccount not found
+    put:
+      tags:
+        - Employees
+        - Customers
+      summary: Updates a account
+      operationId: updateBankaccount
+      description: Calling this allows the employee to update a bankaccount
+      parameters:
+        - name: IBAN
+          in: path
+          description: IBAN of bankaccount to update
+          required: true
+          schema:
+            type: string
+            example: NLxxINHO0xxxxxxxxx
+      responses:
+        '200':
+          description: operation succesful
+        '400':
+          description: bad input parameter
+        '404':
+          description: bankaccount not found
+    delete:
+      tags:
+        - Employees
+      summary: Delete a account
+      operationId: deleteBankaccount
+      description: Calling this allows the employee to delete a bankaccount
+      parameters:
+        - name: IBAN
+          in: path
+          description: IBAN of bankaccount to update
+          required: true
+          schema:
+            type: string
+            example: NLxxINHO0xxxxxxxxx
+      responses:
+        '200':
+          description: operation succesful
+        '400':
+          description: bad input parameter
+        '404':
+          description: bankaccount not found
+  /Bankaccount:
     post:
       tags:
-        - Bankaccount
+        - Employees
       summary: create a bankaccount
       operationId: createBankaccount
       requestBody:
-        description: Create a bankaccount, this option is employee only
+          description: Create a bankaccount, this option is employee only
         required: true
         content:
           application/json:
@@ -323,8 +368,8 @@ paths:
           description: bad input parameter
     put:
       tags:
-        - Bankaccount
-      summary: make the money flows happen
+        - Employees
+      summary: Completes withdraw or deposit
       operationId: completeMoneyFlow
       requestBody:
         description: Complete a deposit or withdraw as an employee
@@ -332,7 +377,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BankaccountMoneyFlow'
+              $ref: '#/components/schemas/DepositOrWithdraw'
       responses:
         '200':
           description: operation succesful
@@ -470,7 +515,8 @@ components:
         Type:
           type: string
           enum: [Current, Savings]
-    BankaccountMoneyFlow:
+          example: Current
+    DepositOrWithdraw:
       type: object
       required:
         - IBAN
@@ -479,10 +525,14 @@ components:
       properties:
         IBAN:
           type: string
+          example: NLxxINHO0xxxxxxxxx
         Type:
           type: string
+          example: Current
         Amount:
           type: integer
+          example: 2000
+          minimum: 0
     Transaction:
       type: object
       required:
