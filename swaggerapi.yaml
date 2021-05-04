@@ -320,10 +320,9 @@ paths:
     get:
       tags:
         - Employees
-        - Customers
       summary: Get bankaccount information
-      operationId: getBankaccount
-      description: Calling this allows you to get all your bankaccount information based on the id
+      operationId: getBankaccountEmployee
+      description: Calling this allows the employee to get all the bankaccount information based on the IBAN
       parameters:
         - name: IBAN
           in: path
@@ -349,13 +348,13 @@ paths:
       tags:
         - Employees
         - Customers
-      summary: Updates a account
-      operationId: updateBankaccount
-      description: Calling this allows the employee to update a bankaccount
+      summary: Edit a account
+      operationId: editBankaccount
+      description: Edits a bankaccount based on the provided information. Employees can enter a IBAN to edit all accounts, Customers can only edit their own account
       parameters:
         - name: IBAN
           in: path
-          description: IBAN of bankaccount to update
+          description: IBAN of bankaccount to edit
           required: true
           schema:
             type: string
@@ -367,6 +366,14 @@ paths:
           description: bad input parameter
         '404':
           description: bankaccount not found
+      requestBody:
+        description: editable fields
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/BankAccountEdit'
     delete:
       tags:
         - Employees
@@ -389,6 +396,25 @@ paths:
         '404':
           description: bankaccount not found
   /Bankaccount:
+    get:
+      tags:
+        - Customers
+      summary: Get bankaccount information
+      operationId: getBankaccountCustomer
+      description: Calling this allows the Customer to get their own bankaccount information
+      responses:
+        '200':
+          description: operation succesful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BankAccount"
+        '400':
+          description: bad input parameter
+        '404':
+          description: bankaccount not found
     post:
       tags:
         - Employees
@@ -574,6 +600,16 @@ components:
       required:
         - accountType
         - name
+      properties:
+        name:
+          type: string
+          example: "Daily Account"
+        accountType:
+          type: string
+          enum: [Current, Savings]
+          example: "Current"
+    BankAccountEdit:
+      type: object
       properties:
         name:
           type: string
