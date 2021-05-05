@@ -209,7 +209,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Transaction"  
+                  $ref: "#/components/schemas/TransactionGet"  
                   
       parameters: 
         - in: query
@@ -657,6 +657,7 @@ components:
           type: integer
           example: 2000
           minimum: 0
+          
     Transaction:
       type: object
       required:
@@ -702,6 +703,27 @@ components:
         amount:
           type: number
           example: 10
+
+    TransactionGet:
+      type: object
+      required: 
+        - Transactions
+        - Count
+        - PageCount
+      properties:
+        Transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        Count:
+          type: integer
+          minimum: 0
+          example: 69
+        PageCount:
+          type: integer
+          minimum: 0
+          example: 7
+
     TransactionEdit:
       type: object
       properties:
