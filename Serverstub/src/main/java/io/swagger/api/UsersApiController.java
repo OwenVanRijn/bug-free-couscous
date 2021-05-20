@@ -62,8 +62,8 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
+        //todo check if user already exists
         User user = mapService.createUser(newUser);
-
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
@@ -111,25 +111,12 @@ public class UsersApiController implements UsersApi {
 
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return", schema = @Schema(allowableValues = {}, maximum = "50"
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+        //todo check if logged user is customer, if yes -> return own user information else return list
         try {
             List<User> users = userService.getAllUsers();
             return new ResponseEntity<List<User>>(users, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
-        /*String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n}, {\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);*/
     }
-
 }

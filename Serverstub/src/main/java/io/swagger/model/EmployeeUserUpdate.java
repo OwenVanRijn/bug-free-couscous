@@ -89,7 +89,7 @@ public class EmployeeUserUpdate   {
    **/
   @Schema(example = "James", description = "")
   
-    public String getFirstName() {
+  public String getFirstName() {
     return firstName;
   }
 

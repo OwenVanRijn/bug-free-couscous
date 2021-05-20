@@ -1,6 +1,7 @@
 package io.swagger.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonPropertyOrder(alphabetic = false)
 public class CreateUserDTO {
@@ -17,7 +18,7 @@ public class CreateUserDTO {
 
     public CreateUserDTO() {
     }
-
+    @Schema(example = "Saywer")
     public String getFirstName() {
         return firstName;
     }
@@ -26,6 +27,7 @@ public class CreateUserDTO {
         this.firstName = firstName;
     }
 
+    @Schema(example = "Ford")
     public String getLastName() {
         return lastName;
     }
@@ -34,6 +36,7 @@ public class CreateUserDTO {
         this.lastName = lastName;
     }
 
+    @Schema(example = "saywerford@email.com")
     public String getEmail() {
         return email;
     }
@@ -42,6 +45,7 @@ public class CreateUserDTO {
         this.email = email;
     }
 
+    @Schema(example = "212-5051666")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -50,6 +54,7 @@ public class CreateUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
+    @Schema(example = "Main Road")
     public String getStreet() {
         return street;
     }
@@ -58,6 +63,7 @@ public class CreateUserDTO {
         this.street = street;
     }
 
+    @Schema(example = "256")
     public Integer getHouseNumber() {
         return houseNumber;
     }
@@ -66,6 +72,7 @@ public class CreateUserDTO {
         this.houseNumber = houseNumber;
     }
 
+    @Schema(example = "19900")
     public String getPostalcode() {
         return postalcode;
     }
@@ -74,6 +81,7 @@ public class CreateUserDTO {
         this.postalcode = postalcode;
     }
 
+    @Schema(example = "New York")
     public String getCity() {
         return city;
     }
@@ -82,6 +90,7 @@ public class CreateUserDTO {
         this.city = city;
     }
 
+    @Schema(example = "America")
     public String getCountry() {
         return country;
     }
