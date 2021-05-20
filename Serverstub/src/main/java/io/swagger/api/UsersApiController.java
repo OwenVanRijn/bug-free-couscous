@@ -1,10 +1,11 @@
 package io.swagger.api;
 
-import io.swagger.model.CreateUser;
+import io.swagger.dto.CreateUserDTO;
 import io.swagger.model.CustomerUserUpdate;
 import io.swagger.model.EmployeeUserUpdate;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.services.MapService;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,24 +52,19 @@ public class UsersApiController implements UsersApi {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private MapService mapService;
+
     @org.springframework.beans.factory.annotation.Autowired
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
     }
 
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUser body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
+        User user = mapService.createUser(newUser);
 
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
@@ -111,18 +107,6 @@ public class UsersApiController implements UsersApi {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        /*String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);*/
     }
 
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return", schema = @Schema(allowableValues = {}, maximum = "50"

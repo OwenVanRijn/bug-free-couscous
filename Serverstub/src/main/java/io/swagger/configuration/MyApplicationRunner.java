@@ -24,29 +24,22 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Address address = initAddress();
 
-        initUser(address);
+        initCustomerUser(address);
     }
 
     private Address initAddress() {
         Address address = new Address();
-        address.setCity("Amsterdam");
-        address.setCountry("Netherlands");
-        address.setHouseNumber(24);
-        address.setPostalcode("1234PF");
-        address.setStreet("Long Street");
+        address.city("Amsterdam").country("Netherlands")
+                .houseNumber(24).postalcode("1234FG").street("Long Street");
 
         return addressRepository.save(address);
     }
 
-    private User initUser(Address address) {
-        User u = new User();
-        u.setFirstName("James");
-        u.setLastName("Dean");
-        u.setRole(User.RoleEnum.CUSTOMER);
-        u.setPhoneNumber("06123456798");
-        u.setAddress(address);
-        u.setEmail("jamesdean@mail.com");
+    private User initCustomerUser(Address address) {
+        User customer = new User();
+        customer.firstName("James").lastName("Dean").role(User.RoleEnum.CUSTOMER)
+                .phoneNumber("0612345678").address(address).email("jamesdean@mail.com");
 
-        return userService.addUser(u);
+        return userService.addUser(customer);
     }
 }

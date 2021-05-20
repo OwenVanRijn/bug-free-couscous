@@ -5,7 +5,7 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.CreateUser;
+import io.swagger.dto.CreateUserDTO;
 import io.swagger.model.CustomerUserUpdate;
 import io.swagger.model.EmployeeUserUpdate;
 import io.swagger.model.User;
@@ -53,7 +53,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUser body);
+    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO body);
 
 
     @Operation(summary = "Delete a User by id", description = "The Employee can delete a User with the User Id.", security = {
