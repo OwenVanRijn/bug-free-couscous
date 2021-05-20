@@ -7,8 +7,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.model.TransactionPerformedBy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -18,10 +24,12 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
-
+@Entity
 public class Transaction   {
   @JsonProperty("id")
-  private Integer id = null;
+  @Id
+  @GeneratedValue
+  private Long id = null;
 
   /**
    * Gets or Sets type
@@ -68,12 +76,14 @@ public class Transaction   {
   private String ibANTo = null;
 
   @JsonProperty("performed_by")
-  private TransactionPerformedBy performedBy = null;
+  @ManyToOne()
+  @Null
+  private User performedBy = null;
 
   @JsonProperty("amount")
   private BigDecimal amount = null;
 
-  public Transaction id(Integer id) {
+  public Transaction id(Long id) {
     this.id = id;
     return this;
   }
@@ -86,11 +96,11 @@ public class Transaction   {
   @Schema(example = "10", required = true, description = "")
       @NotNull
 
-  @Min(0)  public Integer getId() {
+  @Min(0)  public Long getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -175,7 +185,7 @@ public class Transaction   {
     this.ibANTo = ibANTo;
   }
 
-  public Transaction performedBy(TransactionPerformedBy performedBy) {
+  public Transaction performedBy(User performedBy) {
     this.performedBy = performedBy;
     return this;
   }
@@ -188,11 +198,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public TransactionPerformedBy getPerformedBy() {
+    public User getPerformedBy() {
     return performedBy;
   }
 
-  public void setPerformedBy(TransactionPerformedBy performedBy) {
+  public void setPerformedBy(User performedBy) {
     this.performedBy = performedBy;
   }
 

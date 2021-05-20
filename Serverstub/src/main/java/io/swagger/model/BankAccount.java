@@ -10,6 +10,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -19,11 +24,13 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
-
+@Entity
 public class BankAccount   {
   @JsonProperty("name")
   private String name = null;
 
+  @Id
+  @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 
@@ -68,6 +75,7 @@ public class BankAccount   {
 
   @JsonProperty("transactions")
   @Valid
+  @OneToMany
   private List<Transaction> transactions = new ArrayList<Transaction>();
 
   public BankAccount name(String name) {

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -20,9 +22,11 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
-
+@Entity
 public class User   {
   @JsonProperty("id")
+  @Id
+  @GeneratedValue
   private Integer id = null;
 
   @JsonProperty("FirstName")
@@ -38,6 +42,7 @@ public class User   {
   private String phoneNumber = null;
 
   @JsonProperty("Address")
+  @ManyToOne()
   private Address address = null;
 
   /**
@@ -75,10 +80,12 @@ public class User   {
 
   @JsonProperty("BankAccounts")
   @Valid
+  @OneToMany()
   private List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
 
   @JsonProperty("Limits")
   @Valid
+  @OneToMany()
   private List<Limit> limits = new ArrayList<Limit>();
 
   public User id(Integer id) {
