@@ -34,9 +34,6 @@ public class BankAccount   {
   @JsonProperty("id")
   private Integer id = null;
 
-  /**
-   * Gets or Sets accountType
-   */
   public enum AccountTypeEnum {
     CURRENT("Current"),
     
@@ -71,7 +68,7 @@ public class BankAccount   {
   private String IBAN = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  private Double amount = null;
 
   @JsonProperty("transactions")
   @Valid
@@ -158,7 +155,7 @@ public class BankAccount   {
     this.IBAN = IBAN;
   }
 
-  public BankAccount amount(BigDecimal amount) {
+  public BankAccount amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -171,11 +168,11 @@ public class BankAccount   {
       @NotNull
 
     @Valid
-    public BigDecimal getAmount() {
+    public Double getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
 
