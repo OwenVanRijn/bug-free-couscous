@@ -6,6 +6,8 @@
 package io.swagger.api;
 
 import io.swagger.dto.CreateUserDTO;
+import io.swagger.dto.CustomerEditUserDTO;
+import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.model.CustomerUserUpdate;
 import io.swagger.model.EmployeeUserUpdate;
 import io.swagger.model.User;
@@ -53,7 +55,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO body);
+    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO newUser);
 
 
     @Operation(summary = "Delete a User by id", description = "The Employee can delete a User with the User Id.", security = {
@@ -85,7 +87,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody EmployeeUserUpdate body);
+    ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser);
 
 
     @Operation(summary = "Edit the User information", description = "", security = {
@@ -96,7 +98,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody CustomerUserUpdate body);
+    ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody CustomerEditUserDTO editUser);
 
 
     @Operation(summary = "Get a single User", description = "Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email, phone number, address, role, bankaccounts and limits.", security = {

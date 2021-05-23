@@ -12,7 +12,7 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     public UserService() {
     }
@@ -29,4 +29,8 @@ public class UserService {
     public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id);
     }
+
+    public Optional<User> getUserByEmail(String email) { return userRepository.findUserByEmail(email); }
+
+    public void deleteById(Integer id) { userRepository.deleteById(id); }
 }

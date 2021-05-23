@@ -25,8 +25,6 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println("HET WERKT");
-
         Address address = initAddress();
 
         initCustomerUser(address);
@@ -41,12 +39,12 @@ public class MyApplicationRunner implements ApplicationRunner {
         return addressRepository.save(address);
     }
 
-    private User initCustomerUser(Address address) {
+    private void initCustomerUser(Address address) {
         User customer = new User();
         customer.firstName("James").lastName("Dean").role(User.RoleEnum.CUSTOMER)
                 .phoneNumber("0612345678").address(address).email("jamesdean@mail.com");
 
-        return userService.addUser(customer);
+        userService.addUser(customer);
     }
     private BankAccount initBankAccount(){
         BankAccount bankAccount = new BankAccount();

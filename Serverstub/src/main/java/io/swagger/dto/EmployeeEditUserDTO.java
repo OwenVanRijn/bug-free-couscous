@@ -1,5 +1,6 @@
 package io.swagger.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,8 +18,7 @@ public class EmployeeEditUserDTO {
     private Address address;
     private User.RoleEnum role;
 
-    @JsonProperty("BankAccounts")
-    @Valid
+    @JsonIgnore
     private List<BankAccount> bankAccounts;
 
     @JsonProperty("Limits")
@@ -33,6 +33,7 @@ public class EmployeeEditUserDTO {
         return this;
     }
 
+    @Schema(example = "James")
     public String getFirstName() {
         return firstName;
     }
@@ -46,6 +47,7 @@ public class EmployeeEditUserDTO {
         return this;
     }
 
+    @Schema(example = "Ford")
     public String getLastName() {
         return lastName;
     }
@@ -59,6 +61,7 @@ public class EmployeeEditUserDTO {
         return this;
     }
 
+    @Schema(example = "james@email.com")
     public String getEmail() {
         return email;
     }
@@ -72,6 +75,7 @@ public class EmployeeEditUserDTO {
         return this;
     }
 
+    @Schema(example = "+31 6 12345678")
     public String getPhoneNumber() {
         return phoneNumber;
     }

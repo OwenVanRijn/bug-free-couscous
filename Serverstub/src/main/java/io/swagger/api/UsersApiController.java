@@ -1,10 +1,14 @@
 package io.swagger.api;
 
 import io.swagger.dto.CreateUserDTO;
+import io.swagger.dto.CustomerEditUserDTO;
+import io.swagger.dto.EmployeeEditUserDTO;
+import io.swagger.model.Address;
 import io.swagger.model.CustomerUserUpdate;
 import io.swagger.model.EmployeeUserUpdate;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.services.AddressService;
 import io.swagger.services.MapService;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,13 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +51,9 @@ public class UsersApiController implements UsersApi {
     private UserService userService;
 
     @Autowired
+    private AddressService addressService;
+
+    @Autowired
     private MapService mapService;
 
     @org.springframework.beans.factory.annotation.Autowired
@@ -62,42 +63,63 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
-        //todo check if user already exists
-        User user = mapService.createUser(newUser);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) { //check if user email already exists
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT); //todo check how to return message or should i change identifier?
+        } else {
+            User user = mapService.createUser(newUser);
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        }
     }
 
     public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        try {
+            userService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeUserUpdate body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser) {
+        Optional<User> userData = userService.getUserById(2); //id will change to id from securitycontext
 
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        if (userData.isPresent()) {
+            User user = userData.get();
+            user.firstName(editUser.getFirstName()).lastName(editUser.getLastName()).email(editUser.getEmail())
+                    .phoneNumber(editUser.getPhoneNumber()).role(editUser.getRole());
+
+            Address address = user.getAddress();//todo check if this can be done better lol
+            Address newAddress = editUser.getAddress();
+            newAddress.setId(address.getId());
+            user.setAddress(newAddress);
+            addressService.addAddress(user.getAddress()); //save address first before saving user
+
+            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerUserUpdate body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"Role\" : \"Customer\",\n  \"Email\" : \"james@email.com\",\n  \"Limits\" : [ {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  }, {\n    \"current\" : 0,\n    \"name\" : \"AbsoluteLimit\",\n    \"limit\" : 1000\n  } ],\n  \"Address\" : {\n    \"country\" : \"Wakanda\",\n    \"city\" : \"Big City\",\n    \"street\" : \"Long Road\",\n    \"postalcode\" : \"1234AB\",\n    \"houseNumber\" : 10\n  },\n  \"FirstName\" : \"James\",\n  \"BankAccounts\" : [ {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  }, {\n    \"amount\" : 1200,\n    \"IBAN\" : \"NL20RABO124235346\",\n    \"accountType\" : \"Current\",\n    \"name\" : \"Daily Account\",\n    \"id\" : 1,\n    \"transactions\" : [ {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    }, {\n      \"amount\" : 10,\n      \"performed_by\" : {\n        \"role\" : \"Customer\",\n        \"name\" : \"Owen\"\n      },\n      \"IBAN_from\" : \"IBAN01\",\n      \"id\" : 10,\n      \"IBAN_to\" : \"IBAN02\",\n      \"type\" : \"Transaction\",\n      \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n    } ]\n  } ],\n  \"PhoneNumber\" : \"+31 6 12345678\",\n  \"id\" : 1,\n  \"LastName\" : \"Ford\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    @PutMapping("/users")
+    public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
+        //todo get user from db with information from securitycontext, same at editUser()
+        Optional<User> userData = userService.getUserById(2); //id will change to id from securitycontext
 
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        if (userData.isPresent()) {
+            User user = userData.get();
+            user.setEmail(editUser.getEmail());
+            user.setPhoneNumber(editUser.getPhoneNumber());
+
+            Address address = user.getAddress();//todo check if this can be done better lol
+            Address newAddress = editUser.getAddress();
+            newAddress.setId(address.getId());
+            user.setAddress(newAddress);
+            addressService.addAddress(user.getAddress()); //save address first before saving user
+
+            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     public ResponseEntity<User> getUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id) {

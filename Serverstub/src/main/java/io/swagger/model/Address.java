@@ -124,6 +124,14 @@ public class Address   {
     return this;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
   /**
    * Get country
    * @return country
