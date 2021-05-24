@@ -11,7 +11,7 @@ public class TransactionDTO {
     private OffsetDateTime timestamp;
     private String ibanFrom;
     private String ibanTo;
-    private Long amount;
+    private Double amount;
     private PerformingTransactionUser performedBy;
 
     public TransactionDTO(Transaction transaction){
@@ -20,7 +20,7 @@ public class TransactionDTO {
         timestamp = transaction.getTimestamp();
         ibanFrom = transaction.getIbANFrom();
         ibanTo = transaction.getIbANTo();
-        amount = transaction.getAmount();
+        amount = transaction.getAmountAsDecimal();
         performedBy = new PerformingTransactionUser(transaction.getPerformedBy());
     }
 
@@ -44,7 +44,7 @@ public class TransactionDTO {
         return ibanTo;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
@@ -72,7 +72,7 @@ public class TransactionDTO {
         this.ibanTo = ibanTo;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
