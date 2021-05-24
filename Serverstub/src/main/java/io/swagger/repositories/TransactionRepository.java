@@ -12,11 +12,15 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    @Query("SELECT t FROM Transaction t WHERE t.ibANFrom in ?1 OR t.ibANTo in ?1 OR t.id in ?2")
+    @Query("SELECT t FROM Transaction t WHERE t.ibANFrom in ?1 OR t.ibANTo in ?1 OR t.id in ?2 ORDER BY t.timestamp DESC")
     Page<Transaction> getTransactions(List<String> ibans, List<Long> ids, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t")
-    Page<Transaction> getTransaction(Pageable pageable);
+    @Query("SELECT t FROM Transaction t ORDER BY t.timestamp DESC")
+    Page<Transaction> getTransactions(Pageable pageable);
 
-    // TODO: add queries for customers to only query their stuff
+    @Query("SELECT t FROM User u JOIN u.bankAccounts b JOIN b.transactions t WHERE (t.ibANFrom in ?1 OR t.ibANTo in ?1 OR t.id in ?2) AND u.id = ?3 ORDER BY t.timestamp DESC")
+    Page<Transaction> getTransactions(List<String> ibans, List<Long> ids, Integer userId, Pageable pageable);
+
+    @Query("SELECT t FROM User u JOIN u.bankAccounts b JOIN b.transactions t WHERE u.id = ?1 ORDER BY t.timestamp DESC")
+    Page<Transaction> getTransactions(Integer userId, Pageable pageable);
 }

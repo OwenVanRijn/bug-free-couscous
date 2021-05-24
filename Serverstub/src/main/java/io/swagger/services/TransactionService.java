@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,13 +24,20 @@ public class TransactionService {
 
     public TransactionsPageDTO getTransactions(List<Long> ids, List<String> ibans, Integer limit, Integer page, User performingUser) {
         page--; // Page should start at 1
-        Pageable p = PageRequest.of(page, limit); // TODO: add sorting
+        Pageable p = PageRequest.of(page, limit);
         Page<Transaction> t;
-        if (ids == null && ibans == null)
-            t = transactionRepository.getTransaction(p);
-        else
-            t = transactionRepository.getTransactions(ibans, ids, p);
-
+        if (performingUser == null){
+            if (ids == null && ibans == null)
+                t = transactionRepository.getTransactions(p);
+            else
+                t = transactionRepository.getTransactions(ibans, ids, p);
+        }
+        else {
+            if (ids == null && ibans == null)
+                t = transactionRepository.getTransactions(performingUser.getId(), p);
+            else
+                t = transactionRepository.getTransactions(ibans, ids, performingUser.getId(), p);
+        }
         // TODO: add user filtering
 
         return new TransactionsPageDTO(

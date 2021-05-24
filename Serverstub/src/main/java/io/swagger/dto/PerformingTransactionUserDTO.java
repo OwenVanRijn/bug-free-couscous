@@ -2,11 +2,11 @@ package io.swagger.dto;
 
 import io.swagger.model.User;
 
-public class PerformingTransactionUser {
+public class PerformingTransactionUserDTO {
     private String name;
     private User.RoleEnum role;
 
-    public PerformingTransactionUser(User user){
+    public PerformingTransactionUserDTO(User user){
         name = user.getFirstName() + " " + user.getLastName();
         role = user.getRole();
     }

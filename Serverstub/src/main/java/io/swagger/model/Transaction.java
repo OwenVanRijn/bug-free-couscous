@@ -1,5 +1,7 @@
 package io.swagger.model;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -71,7 +73,7 @@ public class Transaction   {
   private TypeEnum type = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  private Date timestamp = null;
 
   @JsonProperty("IBAN_from")
   @Nullable
@@ -129,7 +131,7 @@ public class Transaction   {
     this.type = type;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(Date timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -142,11 +144,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public OffsetDateTime getTimestamp() {
+    public Date getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -292,6 +294,6 @@ public class Transaction   {
   }
 
   public Transaction() {
-    timestamp = OffsetDateTime.now();
+    timestamp = new Date();
   }
 }

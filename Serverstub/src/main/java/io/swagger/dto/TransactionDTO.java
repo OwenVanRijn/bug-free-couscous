@@ -2,26 +2,25 @@ package io.swagger.dto;
 
 import io.swagger.model.Transaction;
 
-import java.math.BigDecimal;
 import org.threeten.bp.OffsetDateTime;
 
 public class TransactionDTO {
     private Long id;
     private Transaction.TypeEnum type;
-    private OffsetDateTime timestamp;
+    private String timestamp;
     private String ibanFrom;
     private String ibanTo;
     private Double amount;
-    private PerformingTransactionUser performedBy;
+    private PerformingTransactionUserDTO performedBy;
 
     public TransactionDTO(Transaction transaction){
         id = transaction.getId();
         type = transaction.getType();
-        timestamp = transaction.getTimestamp();
+        timestamp = transaction.getTimestamp().toString();
         ibanFrom = transaction.getIbANFrom();
         ibanTo = transaction.getIbANTo();
         amount = transaction.getAmountAsDecimal();
-        performedBy = new PerformingTransactionUser(transaction.getPerformedBy());
+        performedBy = new PerformingTransactionUserDTO(transaction.getPerformedBy());
     }
 
     public Long getId() {
@@ -32,7 +31,7 @@ public class TransactionDTO {
         return type;
     }
 
-    public OffsetDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -48,7 +47,7 @@ public class TransactionDTO {
         return amount;
     }
 
-    public PerformingTransactionUser getPerformedBy() {
+    public PerformingTransactionUserDTO getPerformedBy() {
         return performedBy;
     }
 
@@ -60,7 +59,7 @@ public class TransactionDTO {
         this.type = type;
     }
 
-    public void setTimestamp(OffsetDateTime timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -76,7 +75,7 @@ public class TransactionDTO {
         this.amount = amount;
     }
 
-    public void setPerformedBy(PerformingTransactionUser performedBy) {
+    public void setPerformedBy(PerformingTransactionUserDTO performedBy) {
         this.performedBy = performedBy;
     }
 }
