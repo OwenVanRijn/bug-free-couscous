@@ -1,10 +1,8 @@
-package io.swagger.model;
+package io.swagger.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -16,7 +14,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
 
-public class Body   {
+public class TransactionPostDTO {
   @JsonProperty("IBAN_from")
   private String ibANFrom = null;
 
@@ -24,9 +22,9 @@ public class Body   {
   private String ibANTo = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  private Double amount = null;
 
-  public Body ibANFrom(String ibANFrom) {
+  public TransactionPostDTO ibANFrom(String ibANFrom) {
     this.ibANFrom = ibANFrom;
     return this;
   }
@@ -46,7 +44,7 @@ public class Body   {
     this.ibANFrom = ibANFrom;
   }
 
-  public Body ibANTo(String ibANTo) {
+  public TransactionPostDTO ibANTo(String ibANTo) {
     this.ibANTo = ibANTo;
     return this;
   }
@@ -66,7 +64,7 @@ public class Body   {
     this.ibANTo = ibANTo;
   }
 
-  public Body amount(BigDecimal amount) {
+  public TransactionPostDTO amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -79,11 +77,11 @@ public class Body   {
       @NotNull
 
     @Valid
-    public BigDecimal getAmount() {
+    public Double getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
 
@@ -96,7 +94,7 @@ public class Body   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Body body = (Body) o;
+    TransactionPostDTO body = (TransactionPostDTO) o;
     return Objects.equals(this.ibANFrom, body.ibANFrom) &&
         Objects.equals(this.ibANTo, body.ibANTo) &&
         Objects.equals(this.amount, body.amount);

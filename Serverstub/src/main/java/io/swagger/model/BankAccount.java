@@ -249,4 +249,17 @@ public class BankAccount   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+  public void addAmount(Long amount){
+    if (amount > 0)
+      this.amount += amount;
+  }
+
+  public void removeAmount(Long amount) throws Exception {
+    if (amount > 0)
+      this.amount -= amount;
+
+    if (this.amount < 0)
+      throw new Exception("Bank accounts cannot have a negative value");
+  }
 }
