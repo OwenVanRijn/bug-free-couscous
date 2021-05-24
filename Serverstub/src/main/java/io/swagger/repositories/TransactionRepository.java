@@ -18,9 +18,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t ORDER BY t.timestamp DESC")
     Page<Transaction> getTransactions(Pageable pageable);
 
-    @Query("SELECT t FROM User u JOIN u.bankAccounts b JOIN b.transactions t WHERE (t.ibANFrom in ?1 OR t.ibANTo in ?1 OR t.id in ?2) AND u.id = ?3 ORDER BY t.timestamp DESC")
+    @Query("SELECT t FROM User u, Transaction t JOIN u.bankAccounts b WHERE (t.ibANFrom in ?1 OR t.ibANTo in ?1 OR t.id in ?2) AND u.id = ?3 AND (b.IBAN = t.ibANFrom OR b.IBAN = t.ibANTo) ORDER BY t.timestamp DESC")
     Page<Transaction> getTransactions(List<String> ibans, List<Long> ids, Integer userId, Pageable pageable);
 
-    @Query("SELECT t FROM User u JOIN u.bankAccounts b JOIN b.transactions t WHERE u.id = ?1 ORDER BY t.timestamp DESC")
+    @Query("SELECT t FROM User u, Transaction t JOIN u.bankAccounts b WHERE u.id = ?1 AND (b.IBAN = t.ibANFrom OR b.IBAN = t.ibANTo) ORDER BY t.timestamp DESC")
     Page<Transaction> getTransactions(Integer userId, Pageable pageable);
 }
