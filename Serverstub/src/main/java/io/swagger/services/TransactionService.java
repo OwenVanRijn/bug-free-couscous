@@ -3,6 +3,7 @@ package io.swagger.services;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.TransactionPostDTO;
 import io.swagger.dto.TransactionsPageDTO;
+import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
@@ -55,51 +56,59 @@ public class TransactionService {
 
     // iban from is nullable
     private void processTransaction(Transaction t) throws Exception {
-        Optional<BankAccount> from = null;
-        Optional<BankAccount> to = bankaccountService.getBankaccountByIBANSafe(t.getIbANTo());
+        BankAccount from = null;
+        BankAccount to = null;
+
+        Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbANTo());
+        if (toOp.isPresent())
+            to = toOp.get();
 
         if (t.getIbANFrom() != null){
-            from = bankaccountService.getBankaccountByIBANSafe(t.getIbANFrom());
+            Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbANFrom());
+            if (fromOp.isPresent())
+                from = fromOp.get();
         }
 
         // TODO: should an IBAN that we do not know be valid? Transfers from/to other banks?
 
         if (from != null){
-            if (from.isPresent()){
-                BankAccount b = from.get();
-                b.removeAmount(t.getAmount());
-                bankaccountService.saveBankAccount(b);
+            if (t.getType() == Transaction.TypeEnum.TRANSACTION){
+                from.removeAmount(t.getAmount());
+                bankaccountService.saveBankAccount(from);
             }
         }
 
-        if (to.isPresent()){
-            BankAccount b = to.get();
-            b.addAmount(t.getAmount());
-            bankaccountService.saveBankAccount(b);
+        // TODO: this is clearly invalid if to is not present
+
+        if (to != null){
+            if (t.getType() != Transaction.TypeEnum.WITHDRAW){
+                to.addAmount(t.getAmount());
+            }
+            else {
+                to.removeAmount(t.getAmount());
+            }
+
+            bankaccountService.saveBankAccount(to);
         }
-
-
-
-        // TODO: add deposit/withdraw
-
     }
 
     public void createTransaction(TransactionPostDTO tpd, User performingUser) throws Exception {
-        User.RoleEnum role = User.RoleEnum.CUSTOMER; // TODO: change to be based on user
+        // TODO: add IBAN validation
+        User.RoleEnum role = User.RoleEnum.EMPLOYEE; // TODO: change to be based on user
 
-        if (!performingUser.getBankAccounts()
+        if (role == User.RoleEnum.CUSTOMER && performingUser.getBankAccounts()
                 .stream()
-                .anyMatch(x -> x.getIBAN().equals(tpd.getIbANFrom()) || x.getIBAN().equals(tpd.getIbANTo()))) {
-            throw new Exception("Unauthorized");
+                .noneMatch(x -> x.getIBAN().equals(tpd.getIbANFrom()) || x.getIBAN().equals(tpd.getIbANTo()))) {
+            throw new UnauthorisedException();
         }
-
-        // TODO: handle transaction subtraction/addition later
 
         Transaction t = new Transaction();
         Double amount = (tpd.getAmount() * 100);
         t.ibANTo(tpd.getIbANTo())
                 .ibANFrom(tpd.getIbANFrom())
-                .amount(amount.longValue());
+                .amount(amount.longValue())
+                .type(Transaction.TypeEnum.TRANSACTION)
+                .performedBy(performingUser);
 
         processTransaction(t);
 

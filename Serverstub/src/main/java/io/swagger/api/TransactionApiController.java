@@ -2,9 +2,13 @@ package io.swagger.api;
 
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.TransactionPostDTO;
+import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.TransactionEdit;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.User;
 import io.swagger.services.TransactionService;
+import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +33,9 @@ public class TransactionApiController implements TransactionApi {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    UserService userService;
+
     private static final Logger log = LoggerFactory.getLogger(TransactionApiController.class);
 
     private final ObjectMapper objectMapper;
@@ -43,8 +50,22 @@ public class TransactionApiController implements TransactionApi {
 
     public ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body) {
         String accept = request.getHeader("Accept");
+        User u = userService.getAllUsers().get(0); // TODO: get actual performing user
+        try {
+            transactionService.createTransaction(body, u);
+        }
+        catch (BadRequestException e){
+            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+        }
+        catch (UnauthorisedException e){
+            return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+        }
+        catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     public ResponseEntity<Void> deleteTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id) {

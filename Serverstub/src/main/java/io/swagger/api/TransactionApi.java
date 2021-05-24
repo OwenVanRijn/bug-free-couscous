@@ -35,7 +35,8 @@ public interface TransactionApi {
     @Operation(summary = "Create a transaction", description = "Creates a transaction from one IBAN to another. Source iban needs to be from customer unless an employee creates the transaction", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Customers", "Employees" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Successfully added a transaction") })
+        @ApiResponse(responseCode = "200", description = "Successfully added a transaction"),
+        @ApiResponse(responseCode = "400", description = "Bad request") })
     @RequestMapping(value = "/transaction",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)

@@ -4,6 +4,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.exceptions.BadRequestException;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
@@ -251,15 +252,17 @@ public class BankAccount   {
   }
 
   public void addAmount(Long amount){
+    // TODO: change everything to long
     if (amount > 0)
-      this.amount += amount;
+      this.amount += amount.doubleValue() / 100;
   }
 
   public void removeAmount(Long amount) throws Exception {
+    // TODO: change everything to long
     if (amount > 0)
-      this.amount -= amount;
+      this.amount -= amount.doubleValue() / 100;
 
     if (this.amount < 0)
-      throw new Exception("Bank accounts cannot have a negative value");
+      throw new BadRequestException("Bank accounts cannot have a negative value");
   }
 }

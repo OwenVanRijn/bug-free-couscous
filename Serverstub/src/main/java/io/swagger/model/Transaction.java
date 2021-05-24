@@ -17,10 +17,7 @@ import org.springframework.lang.Nullable;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -83,7 +80,7 @@ public class Transaction   {
   private String ibANTo = null;
 
   @JsonProperty("performed_by")
-  @ManyToOne()
+  @ManyToOne(fetch = FetchType.LAZY)
   @Nullable
   private User performedBy = null;
 
