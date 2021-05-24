@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.dto.TransactionDTO;
 import io.swagger.model.TransactionPerformedBy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
+import org.springframework.lang.Nullable;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -72,6 +74,7 @@ public class Transaction   {
   private OffsetDateTime timestamp = null;
 
   @JsonProperty("IBAN_from")
+  @Nullable
   private String ibANFrom = null;
 
   @JsonProperty("IBAN_to")
@@ -79,11 +82,11 @@ public class Transaction   {
 
   @JsonProperty("performed_by")
   @ManyToOne()
-  @Null
+  @Nullable
   private User performedBy = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  private Long amount = null;
 
   public Transaction id(Long id) {
     this.id = id;
@@ -208,7 +211,7 @@ public class Transaction   {
     this.performedBy = performedBy;
   }
 
-  public Transaction amount(BigDecimal amount) {
+  public Transaction amount(Long amount) {
     this.amount = amount;
     return this;
   }
@@ -221,11 +224,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public BigDecimal getAmount() {
+    public Long getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+  public void setAmount(Long amount) {
     this.amount = amount;
   }
 
@@ -278,5 +281,17 @@ public class Transaction   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public TransactionDTO toTransactionDTO(){
+    return new TransactionDTO(this);
+  }
+
+  public Double getAmountAsDecimal(){
+    return amount.doubleValue() / 100;
+  }
+
+  public Transaction() {
+    timestamp = OffsetDateTime.now();
   }
 }

@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.model.Body;
 import io.swagger.model.TransactionEdit;
 import io.swagger.model.TransactionGet;
@@ -70,11 +71,11 @@ public interface TransactionApi {
     @Operation(summary = "Get details of recent transactions", description = "Get details of transactions sorted by date returned as a JSON. Can take transaction ids, ibans, limit and page as filters. Customers can only query from ibans or ids they have access to. Employees can query any id or iban. When no filters are provided, Customers get all recent transactions done from ibans they have access to, Employees get all recent transactions", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Customers", "Employees" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Successfully queried transaction", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TransactionGet.class)))) })
+        @ApiResponse(responseCode = "200", description = "Successfully queried transaction", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TransactionsPageDTO.class)))) })
     @RequestMapping(value = "/transaction",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<TransactionGet>> getTransaction(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "id", required = false) List<Integer> id, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = false) List<String> IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page);
+    ResponseEntity<TransactionsPageDTO> getTransaction(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "id", required = false) List<Long> id, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = false) List<String> IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page);
 
 }
 
