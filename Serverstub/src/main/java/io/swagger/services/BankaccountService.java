@@ -17,5 +17,5 @@ public class BankaccountService {
 
     public List<BankAccount> getAllBankaccounts() { return (List<BankAccount>) bankAccountRepository.findAll(); }
 
-    public List<BankAccount> getBankaccountByIBAN(String IBAN) { return (List<BankAccount>) bankAccountRepository.findById(IBAN).get(); }
+    public BankAccount getBankaccountByIBAN(String IBAN) { return bankAccountRepository.findBankaccountByIBAN(IBAN).get(); }
 }

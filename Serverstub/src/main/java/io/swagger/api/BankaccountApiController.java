@@ -110,11 +110,11 @@ public class BankaccountApiController implements BankaccountApi {
         return new ResponseEntity<List<BankAccount>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
+    public ResponseEntity<BankAccount> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
             required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         try {
-            List<BankAccount> bankAccount = bankaccountService.getAllBankaccounts();
-            return new ResponseEntity<List<BankAccount>>(bankAccount, HttpStatus.OK);
+            BankAccount bankAccount = bankaccountService.getBankaccountByIBAN(IBAN);
+            return new ResponseEntity<>(bankAccount, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
