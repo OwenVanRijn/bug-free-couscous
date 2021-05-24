@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.model.BankAccount;
 import io.swagger.model.BankAccountEdit;
 import io.swagger.model.CreateBankaccount;
@@ -86,14 +87,26 @@ public class BankaccountApiController implements BankaccountApi {
         return new ResponseEntity<List<CreateBankaccountSchema>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to update", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to delete", required=true,
+            schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+        try {
+            bankaccountService.deleteByIBAN(IBAN);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public ResponseEntity<Void> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody List<BankAccountEdit> body) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
+            schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
+        BankAccount bankAccount = bankaccountService.getBankaccountByIBAN(IBAN);
+        try{
+            bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
+            bankaccountService.saveBankAccount(bankAccount);
+            return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public ResponseEntity<List<BankAccount>> getBankaccountCustomer() {

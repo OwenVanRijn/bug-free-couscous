@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.model.BankAccount;
 import io.swagger.model.BankAccountEdit;
 import io.swagger.model.CreateBankaccount;
@@ -92,7 +93,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody List<BankAccountEdit> body);
+    ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount);
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the Customer to get their own bankaccount information", security = {
