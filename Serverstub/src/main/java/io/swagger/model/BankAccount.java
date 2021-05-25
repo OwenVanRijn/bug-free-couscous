@@ -161,6 +161,11 @@ public class BankAccount   {
     return this;
   }
 
+  public BankAccount amount(Double amount) {
+    Double a = amount * 100;
+    this.amount = a.longValue();
+    return this;
+  }
   /**
    * Get amount
    * @return amount
@@ -172,6 +177,11 @@ public class BankAccount   {
     public Long getAmount() {
     return amount;
   }
+
+    @Valid
+    public Double getAmountDecimal() {
+      return amount.doubleValue() / 100;
+    }
 
   public void setAmount(Long amount) {
     this.amount = amount;
@@ -252,15 +262,13 @@ public class BankAccount   {
   }
 
   public void addAmount(Long amount){
-    // TODO: change everything to long
     if (amount > 0)
       this.amount += amount.longValue() / 100;
   }
 
   public void removeAmount(Long amount) throws Exception {
-    // TODO: change everything to long
     if (amount > 0)
-      this.amount -= amount.longValue() / 100;
+      this.amount -= amount.longValue();
 
     if (this.amount < 0)
       throw new BadRequestException("Bank accounts cannot have a negative value");
