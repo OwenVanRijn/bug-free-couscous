@@ -60,7 +60,7 @@ public class MyApplicationRunner implements ApplicationRunner {
     private BankAccount initBankAccount(){
         BankAccount bankAccount = new BankAccount();
         bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL91ABNA0417164300")
-                .amount((long) 1500.00).name("payment account");
+                .amount(1500.00).name("payment account");
 
         return bankAccountRepository.save(bankAccount);
 

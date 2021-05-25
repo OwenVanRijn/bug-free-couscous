@@ -1,11 +1,13 @@
 package io.swagger.dto;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * Body
@@ -13,18 +15,21 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
-
-public class TransactionPostDTO {
+// TODO: figure out inheritance for this?
+public class TransactionPutDTO {
   @JsonProperty("IBAN_from")
+  @Nullable
   protected String ibanFrom = null;
 
   @JsonProperty("IBAN_to")
+  @Nullable
   protected String ibanTo = null;
 
   @JsonProperty("amount")
+  @Nullable
   protected Double amount = null;
 
-  public TransactionPostDTO ibANFrom(String ibANFrom) {
+  public TransactionPutDTO ibANFrom(String ibANFrom) {
     this.ibanFrom = ibANFrom;
     return this;
   }
@@ -33,8 +38,7 @@ public class TransactionPostDTO {
    * Get ibANFrom
    * @return ibANFrom
    **/
-  @Schema(example = "IBAN01", required = true, description = "")
-      @NotNull
+  @Schema(example = "IBAN01", description = "")
 
     public String getIbanFrom() {
     return ibanFrom;
@@ -44,7 +48,7 @@ public class TransactionPostDTO {
     this.ibanFrom = ibanFrom;
   }
 
-  public TransactionPostDTO ibANTo(String ibANTo) {
+  public TransactionPutDTO ibANTo(String ibANTo) {
     this.ibanTo = ibANTo;
     return this;
   }
@@ -53,8 +57,7 @@ public class TransactionPostDTO {
    * Get ibANTo
    * @return ibANTo
    **/
-  @Schema(example = "IBAN02", required = true, description = "")
-      @NotNull
+  @Schema(example = "IBAN02", description = "")
 
     public String getIbanTo() {
     return ibanTo;
@@ -64,7 +67,7 @@ public class TransactionPostDTO {
     this.ibanTo = ibanTo;
   }
 
-  public TransactionPostDTO amount(Double amount) {
+  public TransactionPutDTO amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -73,8 +76,7 @@ public class TransactionPostDTO {
    * Get amount
    * @return amount
    **/
-  @Schema(example = "10.5", required = true, description = "")
-      @NotNull
+  @Schema(example = "10.5", description = "")
 
     @Valid
     public Double getAmount() {
@@ -92,14 +94,14 @@ public class TransactionPostDTO {
 
 
   @Override
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TransactionPostDTO body = (TransactionPostDTO) o;
+    TransactionPutDTO body = (TransactionPutDTO) o;
     return Objects.equals(this.ibanFrom, body.ibanFrom) &&
         Objects.equals(this.ibanTo, body.ibanTo) &&
         Objects.equals(this.amount, body.amount);
@@ -126,10 +128,14 @@ public class TransactionPostDTO {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(java.lang.Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public TransactionPostDTO toPostDto(){
+    return new TransactionPostDTO().amount(amount).ibANFrom(ibanFrom).ibANTo(ibanTo);
   }
 }

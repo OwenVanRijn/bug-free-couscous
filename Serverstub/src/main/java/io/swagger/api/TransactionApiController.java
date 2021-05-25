@@ -1,10 +1,10 @@
 package io.swagger.api;
 
+import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.TransactionPostDTO;
 import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.UnauthorisedException;
-import io.swagger.model.TransactionEdit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.User;
 import io.swagger.services.TransactionService;
@@ -73,8 +73,9 @@ public class TransactionApiController implements TransactionApi {
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody List<TransactionEdit> body) {
+    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) {
         String accept = request.getHeader("Accept");
+        System.out.println(body.toString());
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 

@@ -2,8 +2,6 @@ package io.swagger.dto;
 
 import io.swagger.model.Transaction;
 
-import org.threeten.bp.OffsetDateTime;
-
 public class TransactionDTO {
     private Long id;
     private Transaction.TypeEnum type;
@@ -17,8 +15,8 @@ public class TransactionDTO {
         id = transaction.getId();
         type = transaction.getType();
         timestamp = transaction.getTimestamp().toString();
-        ibanFrom = transaction.getIbANFrom();
-        ibanTo = transaction.getIbANTo();
+        ibanFrom = transaction.getIbanFrom();
+        ibanTo = transaction.getIbanTo();
         amount = transaction.getAmountAsDecimal();
         performedBy = new PerformingTransactionUserDTO(transaction.getPerformedBy());
     }

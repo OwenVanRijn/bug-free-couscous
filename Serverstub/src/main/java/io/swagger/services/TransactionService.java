@@ -1,8 +1,9 @@
 package io.swagger.services;
 
-import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.TransactionPostDTO;
+import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
+import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
@@ -12,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,12 +58,12 @@ public class TransactionService {
         BankAccount from = null;
         BankAccount to = null;
 
-        Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbANTo());
+        Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanTo());
         if (toOp.isPresent())
             to = toOp.get();
 
-        if (t.getIbANFrom() != null){
-            Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbANFrom());
+        if (t.getIbanFrom() != null){
+            Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
             if (fromOp.isPresent())
                 from = fromOp.get();
         }
@@ -98,14 +97,14 @@ public class TransactionService {
 
         if (role == User.RoleEnum.CUSTOMER && performingUser.getBankAccounts()
                 .stream()
-                .noneMatch(x -> x.getIBAN().equals(tpd.getIbANFrom()) || x.getIBAN().equals(tpd.getIbANTo()))) {
+                .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()) || x.getIBAN().equals(tpd.getIbanTo()))) {
             throw new UnauthorisedException();
         }
 
         Transaction t = new Transaction();
         Double amount = (tpd.getAmount() * 100);
-        t.ibANTo(tpd.getIbANTo())
-                .ibANFrom(tpd.getIbANFrom())
+        t.ibANTo(tpd.getIbanTo())
+                .ibANFrom(tpd.getIbanFrom())
                 .amount(amount.longValue())
                 .type(Transaction.TypeEnum.TRANSACTION)
                 .performedBy(performingUser);
@@ -113,5 +112,75 @@ public class TransactionService {
         processTransaction(t);
 
         transactionRepository.save(t);
+    }
+
+    private Transaction applyTransactionDiff(TransactionPostDTO newValue, Transaction oldValue) throws Exception {
+        Transaction finishedDiff = oldValue.copy();
+
+        if (newValue.getAmountLong() == 0)
+            throw new BadRequestException("Value cannot be 0");
+
+        if (!newValue.getIbanFrom().equals(oldValue.getIbanFrom())){
+            Transaction t = new Transaction();
+            t.type(Transaction.TypeEnum.TRANSACTION)
+                    .ibANFrom(newValue.getIbanFrom())
+                    .ibANTo(oldValue.getIbanFrom())
+                    .amount(oldValue.getAmount());
+
+            finishedDiff.ibANFrom(newValue.getIbanFrom());
+            processTransaction(t);
+        }
+
+        if (!newValue.getIbanTo().equals(oldValue.getIbanTo())){
+            Transaction t = new Transaction();
+            t.type(Transaction.TypeEnum.TRANSACTION)
+                    .ibANFrom(oldValue.getIbanTo())
+                    .ibANTo(newValue.getIbanTo())
+                    .amount(oldValue.getAmount());
+
+            finishedDiff.ibANTo(newValue.getIbanTo());
+            processTransaction(t);
+        }
+
+        if (!newValue.getAmountLong().equals(oldValue.getAmount())){
+            Long diff = newValue.getAmountLong() - oldValue.getAmount();
+
+            Transaction t = finishedDiff.copy();
+
+            if (diff < 0) {
+                t.swapIban();
+                diff *= -1;
+            }
+
+            t.amount(diff);
+            processTransaction(t);
+            finishedDiff.amount(newValue.getAmountLong());
+        }
+
+        return finishedDiff;
+    }
+
+    public void editTransaction(TransactionPutDTO tpd, Long transactionId) throws Exception {
+        Optional<Transaction> tOp = transactionRepository.findById(transactionId);
+        if (!tOp.isPresent())
+            throw new BadRequestException("Id not found");
+
+        Transaction t = tOp.get();
+
+        // TODO: validate IBANS
+
+        if (tpd.getAmount() == null){
+            tpd.setAmount(t.getAmountAsDecimal());
+        }
+
+        if (tpd.getIbanFrom() == null){
+            tpd.setIbanFrom(t.getIbanFrom());
+        }
+
+        if (tpd.getIbanTo() == null){
+            tpd.setIbanTo(t.getIbanTo());
+        }
+
+        transactionRepository.save(applyTransactionDiff(tpd.toPostDto(), t));
     }
 }

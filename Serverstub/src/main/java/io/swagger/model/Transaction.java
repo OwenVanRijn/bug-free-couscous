@@ -1,20 +1,15 @@
 package io.swagger.model;
 
-import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.dto.TransactionDTO;
-import io.swagger.model.TransactionPerformedBy;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 
 import org.springframework.lang.Nullable;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -74,10 +69,10 @@ public class Transaction   {
 
   @JsonProperty("IBAN_from")
   @Nullable
-  private String ibANFrom = null;
+  private String ibanFrom = null;
 
   @JsonProperty("IBAN_to")
-  private String ibANTo = null;
+  private String ibanTo = null;
 
   @JsonProperty("performed_by")
   @ManyToOne(fetch = FetchType.LAZY)
@@ -150,7 +145,7 @@ public class Transaction   {
   }
 
   public Transaction ibANFrom(String ibANFrom) {
-    this.ibANFrom = ibANFrom;
+    this.ibanFrom = ibANFrom;
     return this;
   }
 
@@ -161,16 +156,16 @@ public class Transaction   {
   @Schema(example = "IBAN01", required = true, description = "")
       @NotNull
 
-    public String getIbANFrom() {
-    return ibANFrom;
+    public String getIbanFrom() {
+    return ibanFrom;
   }
 
-  public void setIbANFrom(String ibANFrom) {
-    this.ibANFrom = ibANFrom;
+  public void setIbanFrom(String ibANFrom) {
+    this.ibanFrom = ibANFrom;
   }
 
   public Transaction ibANTo(String ibANTo) {
-    this.ibANTo = ibANTo;
+    this.ibanTo = ibANTo;
     return this;
   }
 
@@ -181,12 +176,12 @@ public class Transaction   {
   @Schema(example = "IBAN02", required = true, description = "")
       @NotNull
 
-    public String getIbANTo() {
-    return ibANTo;
+    public String getIbanTo() {
+    return ibanTo;
   }
 
-  public void setIbANTo(String ibANTo) {
-    this.ibANTo = ibANTo;
+  public void setIbanTo(String ibANTo) {
+    this.ibanTo = ibANTo;
   }
 
   public Transaction performedBy(User performedBy) {
@@ -244,15 +239,15 @@ public class Transaction   {
     return Objects.equals(this.id, transaction.id) &&
         Objects.equals(this.type, transaction.type) &&
         Objects.equals(this.timestamp, transaction.timestamp) &&
-        Objects.equals(this.ibANFrom, transaction.ibANFrom) &&
-        Objects.equals(this.ibANTo, transaction.ibANTo) &&
+        Objects.equals(this.ibanFrom, transaction.ibanFrom) &&
+        Objects.equals(this.ibanTo, transaction.ibanTo) &&
         Objects.equals(this.performedBy, transaction.performedBy) &&
         Objects.equals(this.amount, transaction.amount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, type, timestamp, ibANFrom, ibANTo, performedBy, amount);
+    return Objects.hash(id, type, timestamp, ibanFrom, ibanTo, performedBy, amount);
   }
 
   @Override
@@ -263,8 +258,8 @@ public class Transaction   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
-    sb.append("    ibANFrom: ").append(toIndentedString(ibANFrom)).append("\n");
-    sb.append("    ibANTo: ").append(toIndentedString(ibANTo)).append("\n");
+    sb.append("    ibANFrom: ").append(toIndentedString(ibanFrom)).append("\n");
+    sb.append("    ibANTo: ").append(toIndentedString(ibanTo)).append("\n");
     sb.append("    performedBy: ").append(toIndentedString(performedBy)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("}");
@@ -292,5 +287,17 @@ public class Transaction   {
 
   public Transaction() {
     timestamp = new Date();
+  }
+
+  public Transaction copy(){
+    Transaction t = new Transaction();
+    t.id(id).type(type).timestamp(timestamp).ibANFrom(ibanFrom).ibANTo(ibanTo).performedBy(performedBy).amount(amount);
+    return t;
+  }
+
+  public void swapIban(){
+    String a = ibanFrom;
+    ibanFrom = ibanTo;
+    ibanTo = a;
   }
 }
