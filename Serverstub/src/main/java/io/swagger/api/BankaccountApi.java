@@ -36,6 +36,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 @Validated
@@ -121,7 +122,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<BankAccount> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 }
 

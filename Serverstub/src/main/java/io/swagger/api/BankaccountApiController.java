@@ -99,8 +99,9 @@ public class BankaccountApiController implements BankaccountApi {
 
     public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
-        BankAccount bankAccount = bankaccountService.getBankaccountByIBAN(IBAN);
+
         try{
+            BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
             bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
             bankaccountService.saveBankAccount(bankAccount);
             return new ResponseEntity<>(bankAccount, HttpStatus.OK);
@@ -123,10 +124,13 @@ public class BankaccountApiController implements BankaccountApi {
         return new ResponseEntity<List<BankAccount>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<BankAccount> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
+    public ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
             required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         try {
-            BankAccount bankAccount = bankaccountService.getBankaccountByIBAN(IBAN);
+            Optional<BankAccount> bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN);
+            if (!bankAccount.isPresent()){
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(bankAccount, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
