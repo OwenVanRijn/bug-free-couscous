@@ -55,11 +55,12 @@ public interface TransactionApi {
     @Operation(summary = "Edit a transaction", description = "Edits a transaction based on the provided information in the json sent. Updates the money sent on both IBAN's", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employees" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Successfully edited transaction") })
+        @ApiResponse(responseCode = "200", description = "Successfully edited transaction"),
+        @ApiResponse(responseCode = "400", description = "Bad request") })
     @RequestMapping(value = "/transaction/{id}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body);
+    ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body);
 
 
     @Operation(summary = "Get details of recent transactions", description = "Get details of transactions sorted by date returned as a JSON. Can take transaction ids, ibans, limit and page as filters. Customers can only query from ibans or ids they have access to. Employees can query any id or iban. When no filters are provided, Customers get all recent transactions done from ibans they have access to, Employees get all recent transactions", security = {

@@ -4,6 +4,7 @@ import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.TransactionPostDTO;
 import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.User;
@@ -54,15 +55,9 @@ public class TransactionApiController implements TransactionApi {
         try {
             transactionService.createTransaction(body, u);
         }
-        catch (BadRequestException e){
-            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-        }
-        catch (UnauthorisedException e){
-            return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
-        }
-        catch (Exception e){
+        catch (RestException e){
             System.out.println(e);
-            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<Void>(e.getStatus());
         }
 
         return new ResponseEntity<Void>(HttpStatus.OK);
@@ -73,10 +68,18 @@ public class TransactionApiController implements TransactionApi {
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) {
+    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) {
         String accept = request.getHeader("Accept");
-        System.out.println(body.toString());
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+
+        try {
+            transactionService.editTransaction(body, id);
+        }
+        catch (RestException e){
+            System.out.println(e);
+            return new ResponseEntity<Void>(e.getStatus());
+        }
+
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     public ResponseEntity<TransactionsPageDTO> getTransaction(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "id", required = false) List<Long> id, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = false) List<String> IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page) {

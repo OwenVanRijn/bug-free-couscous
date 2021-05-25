@@ -2,17 +2,17 @@ package io.swagger.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class BadRequestException extends RestException {
-    public BadRequestException(String message) {
+public class NotFoundException extends RestException {
+    public NotFoundException(String message) {
         super(message);
     }
 
-    public BadRequestException() {
+    public NotFoundException() {
         super("");
     }
 
     @Override
     public HttpStatus getStatus() {
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.NOT_FOUND;
     }
 }

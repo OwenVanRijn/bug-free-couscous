@@ -4,6 +4,8 @@ import io.swagger.dto.TransactionPostDTO;
 import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.NotFoundException;
+import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
@@ -54,19 +56,32 @@ public class TransactionService {
     }
 
     // iban from is nullable
-    private void processTransaction(Transaction t) throws Exception {
+    private void processTransaction(Transaction t) throws RestException {
+        // TODO: should we add banks that are outside our presence?
+
         BankAccount from = null;
         BankAccount to = null;
 
         Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanTo());
         if (toOp.isPresent())
             to = toOp.get();
+        else if (t.getType() == Transaction.TypeEnum.TRANSACTION){
+            System.out.println("[WARN] From transaction is outside our control!");
+            //throw new BadRequestException("IBAN from not found!");
+        }
 
         if (t.getIbanFrom() != null){
             Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
             if (fromOp.isPresent())
                 from = fromOp.get();
         }
+        else {
+            System.out.println("[WARN] From transaction is outside our control!");
+            //throw new BadRequestException("IBAN to not found!");
+        }
+
+        if (t.getAmount() < 0)
+            throw new BadRequestException("Invalid amount");
 
         // TODO: should an IBAN that we do not know be valid? Transfers from/to other banks?
 
@@ -89,9 +104,11 @@ public class TransactionService {
 
             bankaccountService.saveBankAccount(to);
         }
+
+        System.out.printf("[%s] Executed transaction %s to %s with amount %.2f\n", t.getType().toString(), t.getIbanFrom(), t.getIbanTo(), t.getAmountAsDecimal());
     }
 
-    public void createTransaction(TransactionPostDTO tpd, User performingUser) throws Exception {
+    public void createTransaction(TransactionPostDTO tpd, User performingUser) throws RestException {
         // TODO: add IBAN validation
         User.RoleEnum role = User.RoleEnum.EMPLOYEE; // TODO: change to be based on user
 
@@ -114,11 +131,11 @@ public class TransactionService {
         transactionRepository.save(t);
     }
 
-    private Transaction applyTransactionDiff(TransactionPostDTO newValue, Transaction oldValue) throws Exception {
+    private Transaction applyTransactionDiff(TransactionPostDTO newValue, Transaction oldValue) throws RestException {
         Transaction finishedDiff = oldValue.copy();
 
-        if (newValue.getAmountLong() == 0)
-            throw new BadRequestException("Value cannot be 0");
+        if (newValue.getAmountLong() <= 0)
+            throw new BadRequestException("Value cannot be 0 or below 0");
 
         if (!newValue.getIbanFrom().equals(oldValue.getIbanFrom())){
             Transaction t = new Transaction();
@@ -160,10 +177,10 @@ public class TransactionService {
         return finishedDiff;
     }
 
-    public void editTransaction(TransactionPutDTO tpd, Long transactionId) throws Exception {
+    public void editTransaction(TransactionPutDTO tpd, Long transactionId) throws RestException {
         Optional<Transaction> tOp = transactionRepository.findById(transactionId);
         if (!tOp.isPresent())
-            throw new BadRequestException("Id not found");
+            throw new NotFoundException("Id not found");
 
         Transaction t = tOp.get();
 
