@@ -69,7 +69,7 @@ public class BankAccount   {
   private String IBAN = null;
 
   @JsonProperty("amount")
-  private Double amount = null;
+  private Long amount = null;
 
   @JsonProperty("transactions")
   @Valid
@@ -156,7 +156,7 @@ public class BankAccount   {
     this.IBAN = IBAN;
   }
 
-  public BankAccount amount(Double amount) {
+  public BankAccount amount(Long amount) {
     this.amount = amount;
     return this;
   }
@@ -169,11 +169,11 @@ public class BankAccount   {
       @NotNull
 
     @Valid
-    public Double getAmount() {
+    public Long getAmount() {
     return amount;
   }
 
-  public void setAmount(Double amount) {
+  public void setAmount(Long amount) {
     this.amount = amount;
   }
 
@@ -254,13 +254,13 @@ public class BankAccount   {
   public void addAmount(Long amount){
     // TODO: change everything to long
     if (amount > 0)
-      this.amount += amount.doubleValue() / 100;
+      this.amount += amount.longValue() / 100;
   }
 
   public void removeAmount(Long amount) throws Exception {
     // TODO: change everything to long
     if (amount > 0)
-      this.amount -= amount.doubleValue() / 100;
+      this.amount -= amount.longValue() / 100;
 
     if (this.amount < 0)
       throw new BadRequestException("Bank accounts cannot have a negative value");
