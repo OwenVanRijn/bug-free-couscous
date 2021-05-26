@@ -10,6 +10,8 @@ import io.swagger.model.Limit;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -29,6 +31,10 @@ public class User   {
   @GeneratedValue
   private Integer id = null;
 
+  private String username;
+
+  private String password;
+
   @JsonProperty("FirstName")
   private String firstName = null;
 
@@ -45,38 +51,29 @@ public class User   {
   @ManyToOne()
   private Address address = null;
 
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
   /**
    * Gets or Sets role
    */
-  public enum RoleEnum {
-    CUSTOMER("Customer"),
-    
-    EMPLOYEE("Employee");
 
-    private String value;
-
-    RoleEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static RoleEnum fromValue(String text) {
-      for (RoleEnum b : RoleEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
   @JsonProperty("Role")
-  private RoleEnum role = null;
+  @ElementCollection(fetch = FetchType.EAGER)
+  private List<Role> roles;
 
   @JsonProperty("BankAccounts")
   @Valid
@@ -209,8 +206,8 @@ public class User   {
     this.address = address;
   }
 
-  public User role(RoleEnum role) {
-    this.role = role;
+  public User role(List<Role> roles) {
+    this.roles = roles;
     return this;
   }
 
@@ -221,13 +218,14 @@ public class User   {
   @Schema(example = "Customer", required = true, description = "")
       @NotNull
 
-    public RoleEnum getRole() {
-    return role;
+    public List<Role> getRole() {
+    return roles;
   }
 
-  public void setRole(RoleEnum role) {
-    this.role = role;
+  public void setRoles(List<Role> roles) {
+    this.roles = roles;
   }
+
 
   public User bankAccounts(List<BankAccount> bankAccounts) {
     this.bankAccounts = bankAccounts;
@@ -295,14 +293,14 @@ public class User   {
         Objects.equals(this.email, user.email) &&
         Objects.equals(this.phoneNumber, user.phoneNumber) &&
         Objects.equals(this.address, user.address) &&
-        Objects.equals(this.role, user.role) &&
+        Objects.equals(this.roles, user.roles) &&
         Objects.equals(this.bankAccounts, user.bankAccounts) &&
         Objects.equals(this.limits, user.limits);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, role, bankAccounts, limits);
+    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, roles, bankAccounts, limits);
   }
 
   @Override
@@ -316,7 +314,7 @@ public class User   {
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    phoneNumber: ").append(toIndentedString(phoneNumber)).append("\n");
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
-    sb.append("    role: ").append(toIndentedString(role)).append("\n");
+    sb.append("    role: ").append(toIndentedString(roles)).append("\n");
     sb.append("    bankAccounts: ").append(toIndentedString(bankAccounts)).append("\n");
     sb.append("    limits: ").append(toIndentedString(limits)).append("\n");
     sb.append("}");

@@ -2,6 +2,7 @@ package io.swagger.configuration;
 
 import io.swagger.model.Address;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.BankAccountRepository;
@@ -9,7 +10,10 @@ import io.swagger.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
@@ -22,6 +26,9 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
     BankAccountRepository bankAccountRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -41,8 +48,12 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     private void initCustomerUser(Address address) {
         User customer = new User();
-        customer.firstName("James").lastName("Dean").role(User.RoleEnum.CUSTOMER)
-                .phoneNumber("0612345678").address(address).email("jamesdean@mail.com");
+        customer.firstName("James").lastName("Dean").phoneNumber("0612345678")
+                .address(address).email("jamesdean@mail.com");
+        customer.setRoles(Arrays.asList(Role.ROLE_CUSTOMER));
+
+        customer.setUsername("niek");
+        customer.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(customer);
     }

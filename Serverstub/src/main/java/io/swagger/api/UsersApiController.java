@@ -4,37 +4,35 @@ import io.swagger.dto.CreateUserDTO;
 import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.model.Address;
-import io.swagger.model.CustomerUserUpdate;
-import io.swagger.model.EmployeeUserUpdate;
+import io.swagger.model.Login;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.AddressService;
 import io.swagger.services.MapService;
 import io.swagger.services.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
@@ -63,7 +61,7 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
-        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) { //check if user email already exists
+        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) { //todo check if user email already exists
             return new ResponseEntity<>(null, HttpStatus.CONFLICT); //todo check how to return message or should i change identifier?
         } else {
             User user = mapService.createUser(newUser);
@@ -81,7 +79,7 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser) {
-        Optional<User> userData = userService.getUserById(2); //id will change to id from securitycontext
+        Optional<User> userData = userService.getUserById(2); //todo id will change to id from securitycontext
 
         if (userData.isPresent()) {
             User user = userData.get();
@@ -101,6 +99,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PutMapping("/users")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
         //todo get user from db with information from securitycontext, same at editUser()
         Optional<User> userData = userService.getUserById(2); //id will change to id from securitycontext
@@ -131,9 +130,15 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return", schema = @Schema(allowableValues = {}, maximum = "50"
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
         //todo check if logged user is customer, if yes -> return own user information else return list
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //get logged user information
+
+        System.out.println(auth.getName());
+
+
         try {
             List<User> users = userService.getAllUsers();
             return new ResponseEntity<List<User>>(users, HttpStatus.OK);

@@ -16,7 +16,7 @@ public class EmployeeEditUserDTO {
     private String email;
     private String phoneNumber;
     private Address address;
-    private User.RoleEnum role;
+    private List<Role> roles;
 
     @JsonIgnore
     private List<BankAccount> bankAccounts;
@@ -98,17 +98,17 @@ public class EmployeeEditUserDTO {
         this.address = address;
     }
 
-    public EmployeeEditUserDTO role(User.RoleEnum role) {
-        this.role = role;
+    public EmployeeEditUserDTO role(List<Role> roles) {
+        this.roles = roles;
         return this;
     }
 
-    public User.RoleEnum getRole() {
-        return role;
+    public List<Role> getRole() {
+        return roles;
     }
 
-    public void setRole(User.RoleEnum role) {
-        this.role = role;
+    public void setRole(List<Role> roles) {
+        this.roles = roles;
     }
 
     public EmployeeEditUserDTO bankAccounts(List<BankAccount> bankAccounts) {

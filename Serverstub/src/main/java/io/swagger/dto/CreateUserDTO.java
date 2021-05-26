@@ -8,6 +8,7 @@ public class CreateUserDTO {
 
     private String firstName;
     private String lastName;
+    //todo add username and password
     private String email;
     private String phoneNumber;
     private String street;
