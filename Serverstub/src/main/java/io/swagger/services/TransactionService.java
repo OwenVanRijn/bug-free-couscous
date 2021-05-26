@@ -59,6 +59,9 @@ public class TransactionService {
     private void processTransaction(Transaction t) throws RestException {
         // TODO: should we add banks that are outside our presence?
 
+        if (!IbanHelper.validIban(t.getIbanFrom()) || !IbanHelper.validIban(t.getIbanTo()))
+            throw new BadRequestException("Invalid IBAN");
+
         BankAccount from = null;
         BankAccount to = null;
 
@@ -66,18 +69,18 @@ public class TransactionService {
         if (toOp.isPresent())
             to = toOp.get();
         else if (t.getType() == Transaction.TypeEnum.TRANSACTION){
-            System.out.println("[WARN] From transaction is outside our control!");
-            //throw new BadRequestException("IBAN from not found!");
+            //System.out.println("[WARN] From transaction is outside our control!");
+            throw new BadRequestException("IBAN from not found!");
         }
 
-        if (t.getIbanFrom() != null){
-            Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
-            if (fromOp.isPresent())
-                from = fromOp.get();
+        Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
+
+        if (fromOp.isPresent()){
+            from = fromOp.get();
         }
         else {
-            System.out.println("[WARN] to transaction is outside our control!");
-            //throw new BadRequestException("IBAN to not found!");
+            //System.out.println("[WARN] to transaction is outside our control!");
+            throw new BadRequestException("IBAN to not found!");
         }
 
         int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
