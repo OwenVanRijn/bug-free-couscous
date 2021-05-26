@@ -80,6 +80,8 @@ public class TransactionService {
             //throw new BadRequestException("IBAN to not found!");
         }
 
+        // TODO: add validation of saving/current accounts
+
         if (t.getAmount() < 0)
             throw new BadRequestException("Invalid amount");
 
@@ -199,5 +201,18 @@ public class TransactionService {
         }
 
         transactionRepository.save(applyTransactionDiff(tpd.toPostDto(), t));
+    }
+
+    public void deleteTransaction(Long transactionId) throws RestException {
+        Optional<Transaction> tOp = transactionRepository.findById(transactionId);
+        if (!tOp.isPresent())
+            throw new NotFoundException("Id not found");
+
+        Transaction t = tOp.get();
+        Transaction copyT = t.copy();
+        copyT.swapIban();
+
+        processTransaction(copyT); // Reverse the money that was sent in the transaction
+        transactionRepository.delete(t);
     }
 }

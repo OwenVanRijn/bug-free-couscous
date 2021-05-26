@@ -50,7 +50,7 @@ public interface TransactionApi {
         @ApiResponse(responseCode = "200", description = "Successfully deleted transaction") })
     @RequestMapping(value = "/transaction/{id}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+    ResponseEntity<Void> deleteTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id) throws RestException;
 
 
     @Operation(summary = "Edit a transaction", description = "Edits a transaction based on the provided information in the json sent. Updates the money sent on both IBAN's", security = {
