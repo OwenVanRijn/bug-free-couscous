@@ -1,6 +1,8 @@
 package io.swagger.model;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -13,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -72,10 +71,17 @@ public class BankAccount   {
   @JsonProperty("amount")
   private Long amount = null;
 
-  @JsonProperty("transactions")
-  @Valid
-  @OneToMany
-  private List<Transaction> transactions = new ArrayList<Transaction>();
+  @JsonBackReference
+  @ManyToOne
+  private User owner = null;
+
+  public User getOwner() {
+    return owner;
+  }
+
+  public void setOwner(User owner) {
+    this.owner = owner;
+  }
 
   public BankAccount name(String name) {
     this.name = name;
@@ -188,31 +194,6 @@ public class BankAccount   {
     this.amount = amount;
   }
 
-  public BankAccount transactions(List<Transaction> transactions) {
-    this.transactions = transactions;
-    return this;
-  }
-
-  public BankAccount addTransactionsItem(Transaction transactionsItem) {
-    this.transactions.add(transactionsItem);
-    return this;
-  }
-
-  /**
-   * Get transactions
-   * @return transactions
-   **/
-  @Schema(required = true, description = "")
-      @NotNull
-    @Valid
-    public List<Transaction> getTransactions() {
-    return transactions;
-  }
-
-  public void setTransactions(List<Transaction> transactions) {
-    this.transactions = transactions;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -227,13 +208,12 @@ public class BankAccount   {
         Objects.equals(this.id, bankAccount.id) &&
         Objects.equals(this.accountType, bankAccount.accountType) &&
         Objects.equals(this.IBAN, bankAccount.IBAN) &&
-        Objects.equals(this.amount, bankAccount.amount) &&
-        Objects.equals(this.transactions, bankAccount.transactions);
+        Objects.equals(this.amount, bankAccount.amount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, id, accountType, IBAN, amount, transactions);
+    return Objects.hash(name, id, accountType, IBAN, amount);
   }
 
   @Override
@@ -246,7 +226,6 @@ public class BankAccount   {
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    transactions: ").append(toIndentedString(transactions)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -271,6 +250,7 @@ public class BankAccount   {
     if (amount > 0)
       this.amount -= amount.longValue();
 
+    // TODO: check limit
     if (this.amount < 0)
       throw new BadRequestException("Bank accounts cannot have a negative value");
   }
