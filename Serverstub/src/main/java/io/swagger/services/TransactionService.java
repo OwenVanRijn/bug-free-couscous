@@ -58,65 +58,52 @@ public class TransactionService {
     // iban from is nullable
     private void processTransaction(Transaction t) throws RestException {
         // TODO: should we add banks that are outside our presence?
+        // TODO: should an IBAN that we do not know be valid? Transfers from/to other banks?
 
-        if (!IbanHelper.validIban(t.getIbanFrom()) || !IbanHelper.validIban(t.getIbanTo()))
-            throw new BadRequestException("Invalid IBAN");
+        t.validate();
 
         BankAccount from = null;
         BankAccount to = null;
 
+        Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
         Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanTo());
-        if (toOp.isPresent())
-            to = toOp.get();
+
+        if (fromOp.isPresent())
+            from = fromOp.get();
         else if (t.getType() == Transaction.TypeEnum.TRANSACTION){
             //System.out.println("[WARN] From transaction is outside our control!");
             throw new BadRequestException("IBAN from not found!");
         }
 
-        Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
-
-        if (fromOp.isPresent()){
-            from = fromOp.get();
+        if (toOp.isPresent()){
+            to = toOp.get();
         }
         else {
             //System.out.println("[WARN] to transaction is outside our control!");
             throw new BadRequestException("IBAN to not found!");
         }
 
-        int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
+        if (t.getType() == Transaction.TypeEnum.TRANSACTION){
+            int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
 
-        if (savingCount == 1){
-            if (from.getOwner().getId() != to.getOwner().getId())
-                throw new UnauthorisedException("Trying to transfer to/from save account while not being the owner of it");
-        }
-        else if (savingCount == 2){
-            throw new BadRequestException("You cannot transfer from saving to saving account");
-        }
-
-        if (t.getAmount() < 0)
-            throw new BadRequestException("Invalid amount");
-
-        // TODO: should an IBAN that we do not know be valid? Transfers from/to other banks?
-
-        if (from != null){
-            if (t.getType() == Transaction.TypeEnum.TRANSACTION){
-                from.removeAmount(t.getAmount());
-                bankaccountService.saveBankAccount(from);
+            if (savingCount == 1){
+                if (from.getOwner().getId() != to.getOwner().getId())
+                    throw new UnauthorisedException("Trying to transfer to/from save account while not being the owner of it");
             }
-        }
-
-        // TODO: this is clearly invalid if to is not present
-
-        if (to != null){
-            if (t.getType() != Transaction.TypeEnum.WITHDRAW){
-                to.addAmount(t.getAmount());
-            }
-            else {
-                to.removeAmount(t.getAmount());
+            else if (savingCount == 2){
+                throw new BadRequestException("You cannot transfer from saving to saving account");
             }
 
-            bankaccountService.saveBankAccount(to);
+            from.removeAmount(t.getAmount());
+            bankaccountService.saveBankAccount(from);
         }
+
+        if (t.getType() == Transaction.TypeEnum.WITHDRAW)
+            to.removeAmount(t.getAmount());
+        else
+            to.addAmount(t.getAmount());
+
+        bankaccountService.saveBankAccount(to);
 
         System.out.printf("[%s] Executed transaction %s to %s with amount %.2f\n", t.getType().toString(), t.getIbanFrom(), t.getIbanTo(), t.getAmountAsDecimal());
     }
@@ -148,7 +135,7 @@ public class TransactionService {
         Transaction finishedDiff = oldValue.copy();
 
         if (newValue.getAmountLong() <= 0)
-            throw new BadRequestException("Value cannot be 0 or below 0");
+            throw new BadRequestException("Amount cannot be 0 or below 0");
 
         if (!newValue.getIbanFrom().equals(oldValue.getIbanFrom())){
             Transaction t = new Transaction();

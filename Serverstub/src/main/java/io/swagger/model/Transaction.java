@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.dto.TransactionDTO;
+import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.RestException;
+import io.swagger.services.IbanHelper;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.springframework.lang.Nullable;
@@ -300,4 +303,23 @@ public class Transaction   {
     ibanFrom = ibanTo;
     ibanTo = a;
   }
+
+  public void validate() throws RestException {
+    if (ibanTo == null || amount == null || performedBy == null || timestamp == null || type == null)
+      throw new BadRequestException("Transaction info not set");
+
+    if (ibanFrom == null && type == TypeEnum.TRANSACTION)
+      throw new BadRequestException("Iban from not set on transaction");
+
+    if (!IbanHelper.validIban(ibanFrom) || !IbanHelper.validIban(ibanTo))
+      throw new BadRequestException("Invalid IBAN");
+
+    if (ibanFrom.equals(ibanTo))
+      throw new BadRequestException("Source and Dest cannot be the same");
+
+    if (amount < 0)
+      throw new BadRequestException("Invalid amount");
+  }
+
+
 }
