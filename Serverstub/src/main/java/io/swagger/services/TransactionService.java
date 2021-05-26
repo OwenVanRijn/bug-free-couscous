@@ -80,7 +80,15 @@ public class TransactionService {
             //throw new BadRequestException("IBAN to not found!");
         }
 
-        // TODO: add validation of saving/current accounts
+        int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
+
+        if (savingCount == 1){
+            if (from.getOwner().getId() != to.getOwner().getId())
+                throw new UnauthorisedException("Trying to transfer to/from save account while not being the owner of it");
+        }
+        else if (savingCount == 2){
+            throw new BadRequestException("You cannot transfer from saving to saving account");
+        }
 
         if (t.getAmount() < 0)
             throw new BadRequestException("Invalid amount");
