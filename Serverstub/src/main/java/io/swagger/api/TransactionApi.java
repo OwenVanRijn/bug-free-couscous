@@ -8,6 +8,7 @@ package io.swagger.api;
 import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.TransactionPostDTO;
+import io.swagger.exceptions.RestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -40,7 +41,7 @@ public interface TransactionApi {
     @RequestMapping(value = "/transaction",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body);
+    ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body) throws RestException;
 
 
     @Operation(summary = "Delete a transaction", description = "Deletes the specified transaction. Undo's the money transfered to said account", security = {
@@ -60,7 +61,7 @@ public interface TransactionApi {
     @RequestMapping(value = "/transaction/{id}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body);
+    ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) throws RestException;
 
 
     @Operation(summary = "Get details of recent transactions", description = "Get details of transactions sorted by date returned as a JSON. Can take transaction ids, ibans, limit and page as filters. Customers can only query from ibans or ids they have access to. Employees can query any id or iban. When no filters are provided, Customers get all recent transactions done from ibans they have access to, Employees get all recent transactions", security = {

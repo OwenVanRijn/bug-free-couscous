@@ -76,7 +76,7 @@ public class TransactionService {
                 from = fromOp.get();
         }
         else {
-            System.out.println("[WARN] From transaction is outside our control!");
+            System.out.println("[WARN] to transaction is outside our control!");
             //throw new BadRequestException("IBAN to not found!");
         }
 

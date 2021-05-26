@@ -49,16 +49,9 @@ public class TransactionApiController implements TransactionApi {
         this.request = request;
     }
 
-    public ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body) {
-        String accept = request.getHeader("Accept");
+    public ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body) throws RestException {
         User u = userService.getAllUsers().get(0); // TODO: get actual performing user
-        try {
-            transactionService.createTransaction(body, u);
-        }
-        catch (RestException e){
-            System.out.println(e);
-            return new ResponseEntity<Void>(e.getStatus());
-        }
+        transactionService.createTransaction(body, u);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -68,17 +61,8 @@ public class TransactionApiController implements TransactionApi {
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) {
-        String accept = request.getHeader("Accept");
-
-        try {
-            transactionService.editTransaction(body, id);
-        }
-        catch (RestException e){
-            System.out.println(e);
-            return new ResponseEntity<Void>(e.getStatus());
-        }
-
+    public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) throws RestException {
+        transactionService.editTransaction(body, id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
