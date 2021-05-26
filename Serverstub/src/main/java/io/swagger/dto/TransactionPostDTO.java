@@ -1,10 +1,8 @@
-package io.swagger.model;
+package io.swagger.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -16,18 +14,18 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
 
-public class Body   {
+public class TransactionPostDTO {
   @JsonProperty("IBAN_from")
-  private String ibANFrom = null;
+  protected String ibanFrom = null;
 
   @JsonProperty("IBAN_to")
-  private String ibANTo = null;
+  protected String ibanTo = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  protected Double amount = null;
 
-  public Body ibANFrom(String ibANFrom) {
-    this.ibANFrom = ibANFrom;
+  public TransactionPostDTO ibANFrom(String ibANFrom) {
+    this.ibanFrom = ibANFrom;
     return this;
   }
 
@@ -38,16 +36,16 @@ public class Body   {
   @Schema(example = "IBAN01", required = true, description = "")
       @NotNull
 
-    public String getIbANFrom() {
-    return ibANFrom;
+    public String getIbanFrom() {
+    return ibanFrom;
   }
 
-  public void setIbANFrom(String ibANFrom) {
-    this.ibANFrom = ibANFrom;
+  public void setIbanFrom(String ibanFrom) {
+    this.ibanFrom = ibanFrom;
   }
 
-  public Body ibANTo(String ibANTo) {
-    this.ibANTo = ibANTo;
+  public TransactionPostDTO ibANTo(String ibANTo) {
+    this.ibanTo = ibANTo;
     return this;
   }
 
@@ -58,15 +56,15 @@ public class Body   {
   @Schema(example = "IBAN02", required = true, description = "")
       @NotNull
 
-    public String getIbANTo() {
-    return ibANTo;
+    public String getIbanTo() {
+    return ibanTo;
   }
 
-  public void setIbANTo(String ibANTo) {
-    this.ibANTo = ibANTo;
+  public void setIbanTo(String ibanTo) {
+    this.ibanTo = ibanTo;
   }
 
-  public Body amount(BigDecimal amount) {
+  public TransactionPostDTO amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -79,11 +77,16 @@ public class Body   {
       @NotNull
 
     @Valid
-    public BigDecimal getAmount() {
+    public Double getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+    public Long getAmountLong() {
+      Double a = amount * 100;
+      return a.longValue();
+    }
+
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
 
@@ -96,15 +99,15 @@ public class Body   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Body body = (Body) o;
-    return Objects.equals(this.ibANFrom, body.ibANFrom) &&
-        Objects.equals(this.ibANTo, body.ibANTo) &&
+    TransactionPostDTO body = (TransactionPostDTO) o;
+    return Objects.equals(this.ibanFrom, body.ibanFrom) &&
+        Objects.equals(this.ibanTo, body.ibanTo) &&
         Objects.equals(this.amount, body.amount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ibANFrom, ibANTo, amount);
+    return Objects.hash(ibanFrom, ibanTo, amount);
   }
 
   @Override
@@ -112,8 +115,8 @@ public class Body   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Body {\n");
     
-    sb.append("    ibANFrom: ").append(toIndentedString(ibANFrom)).append("\n");
-    sb.append("    ibANTo: ").append(toIndentedString(ibANTo)).append("\n");
+    sb.append("    ibANFrom: ").append(toIndentedString(ibanFrom)).append("\n");
+    sb.append("    ibANTo: ").append(toIndentedString(ibanTo)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -6,6 +6,8 @@ import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.BankAccountRepository;
+import io.swagger.repositories.LimitRepository;
+import io.swagger.repositories.TransactionRepository;
 import io.swagger.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -29,13 +31,20 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    TransactionRepository transactionRepository;
+
+    @Autowired
+    LimitRepository limitRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
 
-        initCustomerUser(address);
-        initBankAccount();
+        User u = initCustomerUser(address);
+        Limit l = initBankaccountLimit();
+        initBankAccount(l);
+        initTransactions(u);
     }
 
     private Address initAddress() {
@@ -46,7 +55,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         return addressRepository.save(address);
     }
 
-    private void initCustomerUser(Address address) {
+    private User initCustomerUser(Address address) {
         User customer = new User();
         customer.firstName("James").lastName("Dean").phoneNumber("0612345678")
                 .address(address).email("jamesdean@mail.com");
@@ -56,13 +65,31 @@ public class MyApplicationRunner implements ApplicationRunner {
         customer.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(customer);
+        return customer;
     }
-    private BankAccount initBankAccount(){
+    private Limit initBankaccountLimit(){
+        Limit limit = new Limit();
+        limit.name("AbsoluteLimit").current(1500.00).limit(00.00);
+        return limitRepository.save(limit);
+    }
+    private BankAccount initBankAccount(Limit limit){
         BankAccount bankAccount = new BankAccount();
         bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL91ABNA0417164300")
-                .amount(1500.00).name("payment account");
+                .amount(1500.00).name("payment account").addLimitItem(limit);
 
         return bankAccountRepository.save(bankAccount);
 
+    }
+    private void initTransactions(User customer){
+        for (int i = 0; i < 100; i++){
+            Transaction t = new Transaction();
+            t.type(Transaction.TypeEnum.TRANSACTION)
+            .amount(ThreadLocalRandom.current().nextLong(100, 1000))
+            .ibANFrom("NL01INHO0000000001")
+            .ibANTo(String.format("NL%02dINHO0%09d", ThreadLocalRandom.current().nextInt(99), ThreadLocalRandom.current().nextInt(999999999)))
+            .performedBy(customer);
+
+            transactionRepository.save(t);
+        }
     }
 }

@@ -61,7 +61,7 @@ public class CreateBankaccountSchema   {
   private String IBAN = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  private Long amount = null;
 
   public CreateBankaccountSchema name(String name) {
     this.name = name;
@@ -139,7 +139,7 @@ public class CreateBankaccountSchema   {
     this.IBAN = IBAN;
   }
 
-  public CreateBankaccountSchema amount(BigDecimal amount) {
+  public CreateBankaccountSchema amount(Long amount) {
     this.amount = amount;
     return this;
   }
@@ -151,11 +151,11 @@ public class CreateBankaccountSchema   {
   @Schema(example = "1200", description = "")
   
     @Valid
-    public BigDecimal getAmount() {
+    public Long getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+  public void setAmount(Long amount) {
     this.amount = amount;
   }
 

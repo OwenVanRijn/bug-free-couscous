@@ -31,10 +31,10 @@ public class Limit {
   private String name = null;
 
   @JsonProperty("limit")
-  private BigDecimal max = null;
+  private Long max = null;
 
   @JsonProperty("current")
-  private BigDecimal current = null;
+  private Long current = null;
 
   public Limit name(String name) {
     this.name = name;
@@ -56,8 +56,9 @@ public class Limit {
     this.name = name;
   }
 
-  public Limit limit(BigDecimal limit) {
-    this.max = limit;
+  public Limit limit(Double limit) {
+    Double a = limit * 100;
+    this.max = a.longValue();
     return this;
   }
 
@@ -69,16 +70,17 @@ public class Limit {
       @NotNull
 
     @Valid
-    public BigDecimal getMax() {
+    public Long getMax() {
     return max;
   }
 
-  public void setMax(BigDecimal limit) {
+  public void setMax(Long limit) {
     this.max = limit;
   }
 
-  public Limit current(BigDecimal current) {
-    this.current = current;
+  public Limit current(Double current) {
+    Double a = current * 100;
+    this.current = a.longValue();
     return this;
   }
 
@@ -90,11 +92,11 @@ public class Limit {
       @NotNull
 
     @Valid
-    public BigDecimal getCurrent() {
+    public Long getCurrent() {
     return current;
   }
 
-  public void setCurrent(BigDecimal current) {
+  public void setCurrent(Long current) {
     this.current = current;
   }
 

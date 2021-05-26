@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.model.BankAccount;
 import io.swagger.model.BankAccountEdit;
 import io.swagger.model.CreateBankaccount;
@@ -35,6 +36,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 @Validated
@@ -92,7 +94,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody List<BankAccountEdit> body);
+    ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount);
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the Customer to get their own bankaccount information", security = {
@@ -120,7 +122,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 }
 

@@ -1,20 +1,22 @@
 package io.swagger.model;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.Transaction;
+import io.swagger.model.Limit;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -68,12 +70,24 @@ public class BankAccount   {
   private String IBAN = null;
 
   @JsonProperty("amount")
-  private Double amount = null;
+  private Long amount = null;
 
-  @JsonProperty("transactions")
+  @JsonProperty("Limits")
+  @OneToMany()
   @Valid
-  @OneToMany
-  private List<Transaction> transactions = new ArrayList<Transaction>();
+  private List<Limit> limit = new ArrayList<Limit>();
+
+  @JsonBackReference
+  @ManyToOne
+  private User owner = null;
+
+  public User getOwner() {
+    return owner;
+  }
+
+  public void setOwner(User owner) {
+    this.owner = owner;
+  }
 
   public BankAccount name(String name) {
     this.name = name;
@@ -155,11 +169,16 @@ public class BankAccount   {
     this.IBAN = IBAN;
   }
 
-  public BankAccount amount(Double amount) {
+  public BankAccount amount(Long amount) {
     this.amount = amount;
     return this;
   }
 
+  public BankAccount amount(Double amount) {
+    Double a = amount * 100;
+    this.amount = a.longValue();
+    return this;
+  }
   /**
    * Get amount
    * @return amount
@@ -168,39 +187,38 @@ public class BankAccount   {
       @NotNull
 
     @Valid
-    public Double getAmount() {
+    public Long getAmount() {
     return amount;
   }
 
-  public void setAmount(Double amount) {
+    @Valid
+    public Double getAmountDecimal() {
+      return amount.doubleValue() / 100;
+    }
+
+  public void setAmount(Long amount) {
     this.amount = amount;
   }
 
-  public BankAccount transactions(List<Transaction> transactions) {
-    this.transactions = transactions;
-    return this;
-  }
-
-  public BankAccount addTransactionsItem(Transaction transactionsItem) {
-    this.transactions.add(transactionsItem);
+  public BankAccount addLimitItem(Limit limitItem) {
+    this.limit.add(limitItem);
     return this;
   }
 
   /**
-   * Get transactions
-   * @return transactions
+   * Get limit
+   * @return limit
    **/
   @Schema(required = true, description = "")
-      @NotNull
-    @Valid
-    public List<Transaction> getTransactions() {
-    return transactions;
+  @NotNull
+  @Valid
+  public List<Limit> getLimit() {
+    return limit;
   }
 
-  public void setTransactions(List<Transaction> transactions) {
-    this.transactions = transactions;
+  public void setLimit(List<Limit> limit) {
+    this.limit = limit;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -216,12 +234,12 @@ public class BankAccount   {
         Objects.equals(this.accountType, bankAccount.accountType) &&
         Objects.equals(this.IBAN, bankAccount.IBAN) &&
         Objects.equals(this.amount, bankAccount.amount) &&
-        Objects.equals(this.transactions, bankAccount.transactions);
+            Objects.equals(this.limit, bankAccount.limit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, id, accountType, IBAN, amount, transactions);
+    return Objects.hash(name, id, accountType, IBAN, amount, limit);
   }
 
   @Override
@@ -234,7 +252,7 @@ public class BankAccount   {
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    transactions: ").append(toIndentedString(transactions)).append("\n");
+    sb.append("    limit: ").append(toIndentedString(limit)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -248,5 +266,19 @@ public class BankAccount   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public void addAmount(Long amount){
+    if (amount > 0)
+      this.amount += amount.longValue() / 100;
+  }
+
+  public void removeAmount(Long amount) throws RestException {
+    if (amount > 0)
+      this.amount -= amount.longValue();
+
+    // TODO: check limit
+    if (this.amount < 0)
+      throw new BadRequestException("Bank accounts cannot have a negative value");
   }
 }
