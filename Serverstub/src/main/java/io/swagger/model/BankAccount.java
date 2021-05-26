@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.RestException;
 import io.swagger.model.Transaction;
+import io.swagger.model.Limit;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -70,6 +71,11 @@ public class BankAccount   {
 
   @JsonProperty("amount")
   private Long amount = null;
+
+  @JsonProperty("Limits")
+  @OneToMany()
+  @Valid
+  private List<Limit> limit = new ArrayList<Limit>();
 
   @JsonBackReference
   @ManyToOne
@@ -194,6 +200,25 @@ public class BankAccount   {
     this.amount = amount;
   }
 
+  public BankAccount addLimitItem(Limit limitItem) {
+    this.limit.add(limitItem);
+    return this;
+  }
+
+  /**
+   * Get limit
+   * @return limit
+   **/
+  @Schema(required = true, description = "")
+  @NotNull
+  @Valid
+  public List<Limit> getLimit() {
+    return limit;
+  }
+
+  public void setLimit(List<Limit> limit) {
+    this.limit = limit;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -208,12 +233,13 @@ public class BankAccount   {
         Objects.equals(this.id, bankAccount.id) &&
         Objects.equals(this.accountType, bankAccount.accountType) &&
         Objects.equals(this.IBAN, bankAccount.IBAN) &&
-        Objects.equals(this.amount, bankAccount.amount);
+        Objects.equals(this.amount, bankAccount.amount) &&
+            Objects.equals(this.limit, bankAccount.limit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, id, accountType, IBAN, amount);
+    return Objects.hash(name, id, accountType, IBAN, amount, limit);
   }
 
   @Override
@@ -226,6 +252,7 @@ public class BankAccount   {
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
+    sb.append("    limit: ").append(toIndentedString(limit)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -1,11 +1,9 @@
 package io.swagger.configuration;
 
-import io.swagger.model.Address;
-import io.swagger.model.BankAccount;
-import io.swagger.model.Transaction;
-import io.swagger.model.User;
+import io.swagger.model.*;
 import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.BankAccountRepository;
+import io.swagger.repositories.LimitRepository;
 import io.swagger.repositories.TransactionRepository;
 import io.swagger.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +30,16 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Autowired
+    LimitRepository limitRepository;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
 
         User u = initCustomerUser(address);
-        initBankAccount();
+        Limit l = initBankaccountLimit();
+        initBankAccount(l);
         initTransactions(u);
     }
 
@@ -57,15 +59,19 @@ public class MyApplicationRunner implements ApplicationRunner {
         userService.addUser(customer);
         return customer;
     }
-    private BankAccount initBankAccount(){
+    private Limit initBankaccountLimit(){
+        Limit limit = new Limit();
+        limit.name("AbsoluteLimit").current(1500.00).limit(00.00);
+        return limitRepository.save(limit);
+    }
+    private BankAccount initBankAccount(Limit limit){
         BankAccount bankAccount = new BankAccount();
         bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL91ABNA0417164300")
-                .amount(1500.00).name("payment account");
+                .amount(1500.00).name("payment account").addLimitItem(limit);
 
         return bankAccountRepository.save(bankAccount);
 
     }
-
     private void initTransactions(User customer){
         for (int i = 0; i < 100; i++){
             Transaction t = new Transaction();
