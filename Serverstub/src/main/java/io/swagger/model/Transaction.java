@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.RestException;
+import io.swagger.exceptions.ServerErrorException;
 import io.swagger.services.IbanHelper;
 import io.swagger.v3.oas.annotations.media.Schema;
 
