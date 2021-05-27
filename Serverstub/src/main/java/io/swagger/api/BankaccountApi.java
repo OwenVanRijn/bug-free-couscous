@@ -54,7 +54,7 @@ public interface BankaccountApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<List<DepositOrWithdraw>> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body);
+    ResponseEntity<BankAccount> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body);
 
 
     @Operation(summary = "create a bankaccount", description = "", security = {

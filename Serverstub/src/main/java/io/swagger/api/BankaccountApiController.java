@@ -59,18 +59,23 @@ public class BankaccountApiController implements BankaccountApi {
         this.request = request;
     }
 
-    public ResponseEntity<List<DepositOrWithdraw>> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<DepositOrWithdraw>>(objectMapper.readValue("[ {\n  \"Type\" : \"Deposit\",\n  \"IBAN\" : \"NLxxINHO0xxxxxxxxx\",\n  \"Amount\" : 2000\n}, {\n  \"Type\" : \"Deposit\",\n  \"IBAN\" : \"NLxxINHO0xxxxxxxxx\",\n  \"Amount\" : 2000\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<DepositOrWithdraw>>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<BankAccount> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
+        if (body.getAmount() >= 0) {
+            if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) { // Started on the code, make it look better
+                if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT) {
+                    BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).get();
+                    bankAccount.amount(bankAccount.getAmount() + body.getAmount());
+                    bankaccountService.saveBankAccount(bankAccount);
+                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+                } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
+                    BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).get();
+                    bankAccount.amount(bankAccount.getAmount() - body.getAmount());
+                    bankaccountService.saveBankAccount(bankAccount);
+                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+                }
             }
         }
-
-        return new ResponseEntity<List<DepositOrWithdraw>>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
