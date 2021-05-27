@@ -270,7 +270,7 @@ public class BankAccount   {
 
   public void addAmount(Long amount){
     if (amount > 0)
-      this.amount += amount.longValue() / 100;
+      this.amount += amount.longValue();
   }
 
   public void removeAmount(Long amount) throws RestException {
