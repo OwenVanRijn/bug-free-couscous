@@ -73,18 +73,15 @@ public class BankaccountApiController implements BankaccountApi {
         return new ResponseEntity<List<DepositOrWithdraw>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<CreateBankaccountSchema>> createBankaccount(@Parameter(in = ParameterIn.DEFAULT, description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccount body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<CreateBankaccountSchema>>(objectMapper.readValue("[ {\n  \"amount\" : 1200,\n  \"IBAN\" : \"NL20RABO124235346\",\n  \"accountType\" : \"Current\",\n  \"name\" : \"Daily Account\",\n  \"id\" : 1\n}, {\n  \"amount\" : 1200,\n  \"IBAN\" : \"NL20RABO124235346\",\n  \"accountType\" : \"Current\",\n  \"name\" : \"Daily Account\",\n  \"id\" : 1\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<CreateBankaccountSchema>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    public ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
+            description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount) {
+        try{
+        BankAccount bankAccount = bankaccountService.createBankaccount(newBankaccount);
+        return new ResponseEntity<>(bankAccount, HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<List<CreateBankaccountSchema>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to delete", required=true,

@@ -67,8 +67,8 @@ public class MyApplicationRunner implements ApplicationRunner {
     }
     private BankAccount initBankAccount(Limit limit){
         BankAccount bankAccount = new BankAccount();
-        bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL91ABNA0417164300")
-                .amount(1500.00).name("payment account").addLimitItem(limit);
+        bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL01INHO0000000001")
+                .amount(1500.00).name("The Bank account").addLimitItem(limit);
 
         return bankAccountRepository.save(bankAccount);
 

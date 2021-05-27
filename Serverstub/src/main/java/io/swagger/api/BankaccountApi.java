@@ -67,7 +67,7 @@ public interface BankaccountApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<List<CreateBankaccountSchema>> createBankaccount(@Parameter(in = ParameterIn.DEFAULT, description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccount body);
+    ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT, description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount);
 
 
     @Operation(summary = "Delete a account", description = "Calling this allows the employee to delete a bankaccount", security = {
