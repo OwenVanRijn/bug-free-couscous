@@ -118,31 +118,23 @@ public class TransactionService {
             throw new UnauthorisedException();
         }
 
-        Transaction t = new Transaction();
-        Double amount = (tpd.getAmount() * 100);
-        t.ibANTo(tpd.getIbanTo())
-                .ibANFrom(tpd.getIbanFrom())
-                .amount(amount.longValue())
-                .type(Transaction.TypeEnum.TRANSACTION)
-                .performedBy(performingUser);
-
+        Transaction t = tpd.toTransaction(performingUser);
         processTransaction(t);
-
         transactionRepository.save(t);
     }
 
     private Transaction applyTransactionDiff(TransactionPostDTO newValue, Transaction oldValue) throws RestException {
         Transaction finishedDiff = oldValue.copy();
 
-        if (newValue.getAmountLong() <= 0)
-            throw new BadRequestException("Amount cannot be 0 or below 0");
+        newValue.toTransaction(new User()); // to validate the dto
 
         if (!newValue.getIbanFrom().equals(oldValue.getIbanFrom())){
             Transaction t = new Transaction();
             t.type(Transaction.TypeEnum.TRANSACTION)
                     .ibANFrom(newValue.getIbanFrom())
                     .ibANTo(oldValue.getIbanFrom())
-                    .amount(oldValue.getAmount());
+                    .amount(oldValue.getAmount())
+                    .performedBy(new User());
 
             finishedDiff.ibANFrom(newValue.getIbanFrom());
             processTransaction(t);
@@ -153,7 +145,8 @@ public class TransactionService {
             t.type(Transaction.TypeEnum.TRANSACTION)
                     .ibANFrom(oldValue.getIbanTo())
                     .ibANTo(newValue.getIbanTo())
-                    .amount(oldValue.getAmount());
+                    .amount(oldValue.getAmount())
+                    .performedBy(new User());
 
             finishedDiff.ibANTo(newValue.getIbanTo());
             processTransaction(t);
@@ -184,19 +177,7 @@ public class TransactionService {
 
         Transaction t = tOp.get();
 
-        // TODO: validate IBANS
-
-        if (tpd.getAmount() == null){
-            tpd.setAmount(t.getAmountAsDecimal());
-        }
-
-        if (tpd.getIbanFrom() == null){
-            tpd.setIbanFrom(t.getIbanFrom());
-        }
-
-        if (tpd.getIbanTo() == null){
-            tpd.setIbanTo(t.getIbanTo());
-        }
+        tpd.fillEmpty(t);
 
         transactionRepository.save(applyTransactionDiff(tpd.toPostDto(), t));
     }

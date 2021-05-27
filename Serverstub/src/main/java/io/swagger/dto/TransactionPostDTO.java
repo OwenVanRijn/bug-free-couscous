@@ -2,6 +2,9 @@ package io.swagger.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.exceptions.RestException;
+import io.swagger.model.Transaction;
+import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -131,5 +134,17 @@ public class TransactionPostDTO {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public Transaction toTransaction(User performingUser) throws RestException {
+    Transaction t = new Transaction();
+    t.type(Transaction.TypeEnum.TRANSACTION)
+            .ibANFrom(ibanFrom)
+            .ibANTo(ibanTo)
+            .amount(getAmountLong())
+            .performedBy(performingUser);
+
+    t.validate();
+    return t;
   }
 }

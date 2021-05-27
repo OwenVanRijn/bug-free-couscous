@@ -1,6 +1,10 @@
 package io.swagger.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.RestException;
+import io.swagger.exceptions.ServerErrorException;
+import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
@@ -135,7 +139,21 @@ public class TransactionPutDTO {
     return o.toString().replace("\n", "\n    ");
   }
 
-  public TransactionPostDTO toPostDto(){
+  public TransactionPostDTO toPostDto() throws RestException {
+    if (amount == null || ibanFrom == null || ibanTo == null)
+      throw new ServerErrorException("PostDTO is incomplete");
+
     return new TransactionPostDTO().amount(amount).ibANFrom(ibanFrom).ibANTo(ibanTo);
+  }
+
+  public void fillEmpty(Transaction src){
+    if (amount == null)
+      amount = src.getAmountAsDecimal();
+
+    if (ibanFrom == null)
+      ibanFrom = src.getIbanFrom();
+
+    if (ibanTo == null)
+      ibanTo = src.getIbanTo();
   }
 }

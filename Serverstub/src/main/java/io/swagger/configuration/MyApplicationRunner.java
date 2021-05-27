@@ -5,6 +5,7 @@ import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.BankAccountRepository;
 import io.swagger.repositories.LimitRepository;
 import io.swagger.repositories.TransactionRepository;
+import io.swagger.services.IbanHelper;
 import io.swagger.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -78,7 +79,7 @@ public class MyApplicationRunner implements ApplicationRunner {
             t.type(Transaction.TypeEnum.TRANSACTION)
             .amount(ThreadLocalRandom.current().nextLong(100, 1000))
             .ibANFrom("NL01INHO0000000001")
-            .ibANTo(String.format("NL%02dINHO0%09d", ThreadLocalRandom.current().nextInt(99), ThreadLocalRandom.current().nextInt(999999999)))
+            .ibANTo(IbanHelper.generateIban())
             .performedBy(customer);
 
             transactionRepository.save(t);

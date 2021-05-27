@@ -317,7 +317,7 @@ public class Transaction   {
     if (ibanFrom.equals(ibanTo))
       throw new BadRequestException("Source and Dest cannot be the same");
 
-    if (amount < 0)
+    if (amount <= 0)
       throw new BadRequestException("Invalid amount");
   }
 
