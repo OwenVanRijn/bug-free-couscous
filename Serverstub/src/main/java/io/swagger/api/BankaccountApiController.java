@@ -60,22 +60,20 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     public ResponseEntity<BankAccount> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
-        if (body.getAmount() >= 0) {
-            if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) { // Started on the code, make it look better
-                if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT) {
-                    BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).get();
-                    bankAccount.amount(bankAccount.getAmount() + body.getAmount());
-                    bankaccountService.saveBankAccount(bankAccount);
-                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
-                } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
-                    BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).get();
-                    bankAccount.amount(bankAccount.getAmount() - body.getAmount());
-                    bankaccountService.saveBankAccount(bankAccount);
+        try {
+            if (body.getAmount() >= 0) {
+                if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
+                    BankAccount bankAccount = bankaccountService.DepositOrWithdraw(body);
+                    if (bankAccount == null){
+                        return  new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
                     return new ResponseEntity<>(bankAccount, HttpStatus.OK);
                 }
             }
+            return  new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
@@ -86,7 +84,6 @@ public class BankaccountApiController implements BankaccountApi {
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to delete", required=true,
@@ -101,7 +98,6 @@ public class BankaccountApiController implements BankaccountApi {
 
     public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
-
         try{
             BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
             bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
