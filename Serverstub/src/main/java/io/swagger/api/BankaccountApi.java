@@ -6,11 +6,8 @@
 package io.swagger.api;
 
 import io.swagger.dto.CreateBankaccountDTO;
-import io.swagger.model.BankAccount;
-import io.swagger.model.BankAccountEdit;
-import io.swagger.model.CreateBankaccount;
-import io.swagger.model.CreateBankaccountSchema;
-import io.swagger.model.DepositOrWithdraw;
+import io.swagger.dto.TransactionDTO;
+import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -54,7 +51,7 @@ public interface BankaccountApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<BankAccount> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body);
+    ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body);
 
 
     @Operation(summary = "create a bankaccount", description = "", security = {

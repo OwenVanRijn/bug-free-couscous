@@ -36,7 +36,7 @@ public class BankaccountService {
         bankAccountRepository.save(b);}
 
     public void deleteByIBAN(String IBAN) {bankAccountRepository.deleteByIBAN(IBAN);}
-    
+
     public BankAccount createBankaccount(CreateBankaccountDTO bankaccountDTO){
         BankAccount bankAccount = convertToBankaccount(bankaccountDTO);
         return bankAccountRepository.save(bankAccount);
@@ -56,26 +56,26 @@ public class BankaccountService {
                     .addLimitItem(limit);
             return bankAccount;
         }
-    public BankAccount DepositOrWithdraw(DepositOrWithdraw body){
-        BankAccount bankAccount = new BankAccount();
-        if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT) {
-            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
-            Limit limit = bankAccount.getLimit().get(0);
-            bankAccount.amount(bankAccount.getAmount() + body.getAmount());
-            limit.current(bankAccount.getAmountDecimal());
-            saveBankAccount(bankAccount);
-            return bankAccount;
-        } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
-            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
-            Limit limit = bankAccount.getLimit().get(0);
-            if (bankAccount.getAmount() - body.getAmount() >= limit.getMax()) {
-                bankAccount.amount(bankAccount.getAmount() - body.getAmount());
-                limit.current(bankAccount.getAmountDecimal());
-                saveBankAccount(bankAccount);
-                return bankAccount;
-            }
-        }
-        return bankAccount = null;
-    }
+//    public BankAccount DepositOrWithdraw(DepositOrWithdraw body){
+//        BankAccount bankAccount = new BankAccount();
+//        if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT) {
+//            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
+//            Limit limit = bankAccount.getLimit().get(0);
+//            bankAccount.amount(bankAccount.getAmount() + body.getAmount());
+//            limit.current(bankAccount.getAmountDecimal());
+//            saveBankAccount(bankAccount);
+//            return bankAccount;
+//        } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
+//            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
+//            Limit limit = bankAccount.getLimit().get(0);
+//            if (bankAccount.getAmount() - body.getAmount() >= limit.getMax()) {
+//                bankAccount.amount(bankAccount.getAmount() - body.getAmount());
+//                limit.current(bankAccount.getAmountDecimal());
+//                saveBankAccount(bankAccount);
+//                return bankAccount;
+//            }
+//        }
+//        return bankAccount = null;
+//    }
 }
 

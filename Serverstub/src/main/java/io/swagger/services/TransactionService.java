@@ -194,4 +194,7 @@ public class TransactionService {
         processTransaction(copyT); // Reverse the money that was sent in the transaction
         transactionRepository.delete(t);
     }
+    public void DepositOrWithdraw(Transaction t) throws RestException {
+        processTransaction(t);
+    }
 }

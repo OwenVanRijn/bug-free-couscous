@@ -1,13 +1,12 @@
 package io.swagger.api;
 
 import io.swagger.dto.CreateBankaccountDTO;
-import io.swagger.model.BankAccount;
-import io.swagger.model.BankAccountEdit;
-import io.swagger.model.CreateBankaccount;
-import io.swagger.model.CreateBankaccountSchema;
-import io.swagger.model.DepositOrWithdraw;
+import io.swagger.dto.TransactionDTO;
+import io.swagger.exceptions.RestException;
+import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.BankaccountService;
+import io.swagger.services.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -53,6 +52,9 @@ public class BankaccountApiController implements BankaccountApi {
     @Autowired
     private BankaccountService bankaccountService;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @org.springframework.beans.factory.annotation.Autowired
     public BankaccountApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
@@ -60,22 +62,42 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Employee PUT /api/Bankaccount
-    public ResponseEntity<BankAccount> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
+    public ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
         try {
-            if (body.getAmount() >= 0) {
-                if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
-                    BankAccount bankAccount = bankaccountService.DepositOrWithdraw(body);
-                    if (bankAccount == null){
-                        return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                    }
-                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
-                }
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            Transaction t = new Transaction();
+            User u = new User();
+            u.firstName("John").lastName("Bond").role(User.RoleEnum.EMPLOYEE);
+            t.ibANFrom("NL01INHO0000000001")
+                    .ibANTo(body.getIBAN())
+                    .amount(body.getAmount().longValue())
+                    .performedBy(u);
+            if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT){
+            t.type(Transaction.TypeEnum.DEPOSIT);
+            } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW)
+            {
+                t.type(Transaction.TypeEnum.WITHDRAW);
             }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e){
+            TransactionDTO transactionDTO= new TransactionDTO(t);
+            transactionService.DepositOrWithdraw(t);
+            return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+        } catch (RestException e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+//            if (body.getAmount() >= 0) {
+//                if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
+//                    BankAccount bankAccount = bankaccountService.DepositOrWithdraw(body);
+//                    if (bankAccount == null){
+//                        return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//                    }
+//                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+//                }
+//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            }
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        } catch (Exception e){
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
     }
 
     // Employee POST /api/Bankaccount
