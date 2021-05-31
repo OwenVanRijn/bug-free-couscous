@@ -66,7 +66,7 @@ public class BankAccount   {
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
-  @JsonProperty("IBAN")
+  @JsonProperty("iban")
   private String IBAN = null;
 
   @JsonProperty("amount")
@@ -161,7 +161,7 @@ public class BankAccount   {
   @Schema(example = "NL20RABO124235346", required = true, description = "")
       @NotNull
 
-    public String getIBAN() {
+  public String getIBAN() {
     return IBAN;
   }
 
