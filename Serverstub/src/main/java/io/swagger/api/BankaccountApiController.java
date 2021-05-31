@@ -84,20 +84,6 @@ public class BankaccountApiController implements BankaccountApi {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-//            if (body.getAmount() >= 0) {
-//                if (bankaccountService.getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
-//                    BankAccount bankAccount = bankaccountService.DepositOrWithdraw(body);
-//                    if (bankAccount == null){
-//                        return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//                    }
-//                    return new ResponseEntity<>(bankAccount, HttpStatus.OK);
-//                }
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        } catch (Exception e){
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
     }
 
     // Employee POST /api/Bankaccount

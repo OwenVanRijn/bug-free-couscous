@@ -273,12 +273,12 @@ public class BankAccount   {
       this.amount += amount.longValue();
   }
 
-  public void removeAmount(Long amount) throws RestException {
+  public void removeAmount(Long amount, Long max) throws RestException {
     if (amount > 0)
       this.amount -= amount.longValue();
 
     // TODO: check limit
-    if (this.amount < 0)
-      throw new BadRequestException("Bank accounts cannot have a negative value");
+    if (this.amount < max)
+      throw new BadRequestException("Bank accounts cannot go under the limit");
   }
 }

@@ -4,8 +4,10 @@ import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.model.BankAccount;
 import io.swagger.model.DepositOrWithdraw;
 import io.swagger.model.Limit;
+import io.swagger.model.User;
 import io.swagger.repositories.BankAccountRepository;
 import io.swagger.repositories.LimitRepository;
+import io.swagger.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,9 @@ public class BankaccountService {
     private LimitRepository limitRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private IbanHelper ibanHelper;
 
     public BankaccountService(){}
@@ -44,38 +49,19 @@ public class BankaccountService {
 
     public BankAccount convertToBankaccount(CreateBankaccountDTO bankaccountDTO)
     {
-            Limit limit = new Limit();
-            limit.name("Absolute Limit").current(00.00).limit(00.00);
-            limitRepository.save(limit);
-            BankAccount bankAccount = new BankAccount();
-            String Iban = ibanHelper.generateUnusedIban();
-            bankAccount.name(bankaccountDTO.getName()) // add owner ID
-                    .accountType(bankaccountDTO.getAccountType())
-                    .amount(0.00)
-                    .IBAN(Iban)
-                    .addLimitItem(limit);
-            return bankAccount;
-        }
-//    public BankAccount DepositOrWithdraw(DepositOrWithdraw body){
-//        BankAccount bankAccount = new BankAccount();
-//        if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT) {
-//            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
-//            Limit limit = bankAccount.getLimit().get(0);
-//            bankAccount.amount(bankAccount.getAmount() + body.getAmount());
-//            limit.current(bankAccount.getAmountDecimal());
-//            saveBankAccount(bankAccount);
-//            return bankAccount;
-//        } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
-//            bankAccount = getBankaccountByIBANSafe(body.getIBAN()).get();
-//            Limit limit = bankAccount.getLimit().get(0);
-//            if (bankAccount.getAmount() - body.getAmount() >= limit.getMax()) {
-//                bankAccount.amount(bankAccount.getAmount() - body.getAmount());
-//                limit.current(bankAccount.getAmountDecimal());
-//                saveBankAccount(bankAccount);
-//                return bankAccount;
-//            }
-//        }
-//        return bankAccount = null;
-//    }
+        User testUser = userRepository.getOne(2); // Only for test purposes, will be changed when working with accounts
+        Limit limit = new Limit();
+        limit.name("Absolute Limit").current(00.00).limit(00.00);
+        limitRepository.save(limit);
+        BankAccount bankAccount = new BankAccount();
+        String Iban = ibanHelper.generateUnusedIban();
+        bankAccount.name(bankaccountDTO.getName())
+                .accountType(bankaccountDTO.getAccountType())
+                .amount(0.00)
+                .IBAN(Iban)
+                .addLimitItem(limit)
+                .setOwner(testUser);
+        return bankAccount;
+    }
 }
 

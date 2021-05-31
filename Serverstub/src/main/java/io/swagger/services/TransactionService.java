@@ -8,6 +8,7 @@ import io.swagger.exceptions.NotFoundException;
 import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Limit;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repositories.TransactionRepository;
@@ -83,6 +84,8 @@ public class TransactionService {
             throw new BadRequestException("IBAN to not found!");
         }
 
+        Limit limit = to.getLimit().get(0);
+
         if (t.getType() == Transaction.TypeEnum.TRANSACTION){
             int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
 
@@ -94,14 +97,16 @@ public class TransactionService {
                 throw new BadRequestException("You cannot transfer from saving to saving account");
             }
 
-            from.removeAmount(t.getAmount());
+            from.removeAmount(t.getAmount(), limit.getMax());
             bankaccountService.saveBankAccount(from);
         }
 
         if (t.getType() == Transaction.TypeEnum.WITHDRAW)
-            to.removeAmount(t.getAmount());
+            to.removeAmount(t.getAmount(), limit.getMax());
         else
             to.addAmount(t.getAmount());
+
+        limit.current(to.getAmountDecimal());
 
         bankaccountService.saveBankAccount(to);
 
