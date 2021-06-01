@@ -7,6 +7,7 @@ import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
@@ -18,6 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,39 +54,38 @@ public class TransactionApiController implements TransactionApi {
         this.request = request;
     }
 
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<Void> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "argument fields", required=true, schema=@Schema()) @Valid @RequestBody TransactionPostDTO body) throws RestException {
-        User u = userService.getAllUsers().get(0); // TODO: get actual performing user
-        transactionService.createTransaction(body, u);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User performingUser = userService.getUserByUsername(auth.getName());
+
+        transactionService.createTransaction(body, performingUser);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id) throws RestException {
         transactionService.deleteTransaction(id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Void> editTransaction(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Long id,@Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody TransactionPutDTO body) throws RestException {
         transactionService.editTransaction(body, id);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<TransactionsPageDTO> getTransaction(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "id", required = false) List<Long> id, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "IBAN", required = false) List<String> IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="50")) @Valid @RequestParam(value = "limit", required = false, defaultValue="50") Integer limit, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema( defaultValue="1")) @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page) {
-        String accept = request.getHeader("Accept");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        return new ResponseEntity<TransactionsPageDTO>(transactionService.getTransactions(id, IBAN, limit, page, null), HttpStatus.OK);
-        /*
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<TransactionGet>>(objectMapper.readValue("[ {\n  \"Transactions\" : [ {\n    \"amount\" : 10,\n    \"performed_by\" : {\n      \"role\" : \"Customer\",\n      \"name\" : \"Owen\"\n    },\n    \"IBAN_from\" : \"IBAN01\",\n    \"id\" : 10,\n    \"IBAN_to\" : \"IBAN02\",\n    \"type\" : \"Transaction\",\n    \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n  }, {\n    \"amount\" : 10,\n    \"performed_by\" : {\n      \"role\" : \"Customer\",\n      \"name\" : \"Owen\"\n    },\n    \"IBAN_from\" : \"IBAN01\",\n    \"id\" : 10,\n    \"IBAN_to\" : \"IBAN02\",\n    \"type\" : \"Transaction\",\n    \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n  } ],\n  \"PageCount\" : 7,\n  \"Count\" : 69\n}, {\n  \"Transactions\" : [ {\n    \"amount\" : 10,\n    \"performed_by\" : {\n      \"role\" : \"Customer\",\n      \"name\" : \"Owen\"\n    },\n    \"IBAN_from\" : \"IBAN01\",\n    \"id\" : 10,\n    \"IBAN_to\" : \"IBAN02\",\n    \"type\" : \"Transaction\",\n    \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n  }, {\n    \"amount\" : 10,\n    \"performed_by\" : {\n      \"role\" : \"Customer\",\n      \"name\" : \"Owen\"\n    },\n    \"IBAN_from\" : \"IBAN01\",\n    \"id\" : 10,\n    \"IBAN_to\" : \"IBAN02\",\n    \"type\" : \"Transaction\",\n    \"timestamp\" : \"2015-07-20T15:49:04-07:00\"\n  } ],\n  \"PageCount\" : 7,\n  \"Count\" : 69\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<TransactionGet>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        User performingUser = null;
+
+        if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
+            performingUser = userService.getUserByUsername(auth.getName());
         }
 
-        return new ResponseEntity<List<TransactionGet>>(HttpStatus.NOT_IMPLEMENTED);
-
-         */
+        return new ResponseEntity<TransactionsPageDTO>(transactionService.getTransactions(id, IBAN, limit, page, performingUser), HttpStatus.OK);
     }
 }

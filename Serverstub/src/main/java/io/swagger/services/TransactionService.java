@@ -112,9 +112,7 @@ public class TransactionService {
 
     public void createTransaction(TransactionPostDTO tpd, User performingUser) throws RestException {
         // TODO: add IBAN validation
-        Role role = Role.ROLE_EMPLOYEE; // TODO: change to be based on user
-
-        if (role == Role.ROLE_CUSTOMER && performingUser.getBankAccounts()
+        if (!performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && performingUser.getBankAccounts()
                 .stream()
                 .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()))) {
             throw new UnauthorisedException();
