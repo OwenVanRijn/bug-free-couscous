@@ -291,13 +291,13 @@ public class User   {
         Objects.equals(this.email, user.email) &&
         Objects.equals(this.phoneNumber, user.phoneNumber) &&
         Objects.equals(this.address, user.address) &&
-        Objects.equals(this.role, user.role) &&
+        Objects.equals(this.roles, user.roles) &&
         Objects.equals(this.bankAccounts, user.bankAccounts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, role, bankAccounts);
+    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, roles, bankAccounts);
   }
 
   @Override

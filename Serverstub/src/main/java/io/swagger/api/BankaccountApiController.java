@@ -35,6 +35,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +67,7 @@ public class BankaccountApiController implements BankaccountApi {
         try {
             Transaction t = new Transaction();
             User u = new User();
-            u.firstName("John").lastName("Bond").role(User.RoleEnum.EMPLOYEE);
+            u.firstName("John").lastName("Bond").role(Collections.singletonList(Role.ROLE_EMPLOYEE));
             t.ibANFrom("NL01INHO0000000001")
                     .ibANTo(body.getIBAN())
                     .amount(body.getAmount().longValue())
