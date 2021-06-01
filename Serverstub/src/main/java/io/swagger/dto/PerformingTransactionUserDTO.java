@@ -1,10 +1,14 @@
 package io.swagger.dto;
 
+import io.swagger.model.Role;
 import io.swagger.model.User;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class PerformingTransactionUserDTO {
     private String name;
-    private User.RoleEnum role;
+    private List<Role> role;
 
     public PerformingTransactionUserDTO(User user){
         name = user.getFirstName() + " " + user.getLastName();
@@ -15,7 +19,7 @@ public class PerformingTransactionUserDTO {
         return name;
     }
 
-    public User.RoleEnum getRole() {
+    public List<Role> getRole() {
         return role;
     }
 
@@ -23,7 +27,7 @@ public class PerformingTransactionUserDTO {
         this.name = name;
     }
 
-    public void setRole(User.RoleEnum role) {
+    public void setRole(List<Role> role) {
         this.role = role;
     }
 }
