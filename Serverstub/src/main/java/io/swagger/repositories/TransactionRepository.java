@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -23,4 +24,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM User u, Transaction t JOIN u.bankAccounts b WHERE u.id = ?1 AND (b.IBAN = t.ibanFrom OR b.IBAN = t.ibanTo) ORDER BY t.timestamp DESC")
     Page<Transaction> getTransactions(Integer userId, Pageable pageable);
+
+    @Query("SELECT count(*) FROM User u, Transaction t JOIN u.bankAccounts b WHERE u.id = ?1 AND (b.IBAN = t.ibanFrom OR b.IBAN = t.ibanTo)")
+    Long countTransactionsByUser(Integer userId);
+
+    @Query("SELECT count(*) FROM User u, Transaction t JOIN u.bankAccounts b WHERE u.id = ?1 AND (b.IBAN = t.ibanFrom OR b.IBAN = t.ibanTo) AND t.timestamp > ?2")
+    Long countTransactionsByUserBeforeDate(Integer userId, Date date);
 }

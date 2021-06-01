@@ -19,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,9 +60,9 @@ public class TransactionService {
     }
 
     // iban from is nullable
+    // TODO: add force option, only customers should have checked limits
     private void processTransaction(Transaction t) throws RestException {
-        // TODO: should we add banks that are outside our presence?
-        // TODO: should an IBAN that we do not know be valid? Transfers from/to other banks?
+        // TODO: should we add banks that are outside our presence? should an IBAN that we do not know be valid? Transfers from/to other banks?
 
         t.validate();
 
@@ -70,8 +72,24 @@ public class TransactionService {
         Optional<BankAccount> fromOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanFrom());
         Optional<BankAccount> toOp = bankaccountService.getBankaccountByIBANSafe(t.getIbanTo());
 
-        if (fromOp.isPresent())
+        if (fromOp.isPresent()) {
             from = fromOp.get();
+            if (t.getType() == Transaction.TypeEnum.TRANSACTION){
+                Long totalCount = transactionRepository.countTransactionsByUser(from.getOwner().getId());
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.HOUR, -24);
+                Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(from.getOwner().getId(), cal.getTime());
+
+                assert from.getOwner().getDailyLimit() != null;
+                if (from.getOwner().getDailyLimit().getMax() <= dayCount)
+                    throw new BadRequestException("From account has reached the daily transaction limit");
+
+                assert from.getOwner().getGlobalLimit() != null;
+                if (from.getOwner().getGlobalLimit().getMax() <= totalCount)
+                    throw new BadRequestException("From account has reached the transaction limit");
+            }
+        }
+
         else if (t.getType() == Transaction.TypeEnum.TRANSACTION){
             //System.out.println("[WARN] From transaction is outside our control!");
             throw new BadRequestException("IBAN from not found!");
@@ -79,6 +97,20 @@ public class TransactionService {
 
         if (toOp.isPresent()){
             to = toOp.get();
+            if (t.getType() == Transaction.TypeEnum.TRANSACTION){ // TODO: copy pasted, please fix
+                Long totalCount = transactionRepository.countTransactionsByUser(to.getOwner().getId());
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.HOUR, -24);
+                Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(to.getOwner().getId(), cal.getTime());
+
+                assert to.getOwner().getDailyLimit() != null;
+                if (to.getOwner().getDailyLimit().getMax() <= dayCount)
+                    throw new BadRequestException("To account has reached the daily transaction limit");
+
+                assert to.getOwner().getGlobalLimit() != null;
+                if (to.getOwner().getGlobalLimit().getMax() <= totalCount)
+                    throw new BadRequestException("To account has reached the transaction limit");
+            }
         }
         else {
             //System.out.println("[WARN] to transaction is outside our control!");
