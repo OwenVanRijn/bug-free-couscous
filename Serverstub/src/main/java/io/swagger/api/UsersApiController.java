@@ -84,7 +84,9 @@ public class UsersApiController implements UsersApi {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser) {
-        Optional<User> userData = userService.getUserById(id); //todo id will change to id from securitycontext
+        Optional<User> userData = userService.getUserById(id);
+
+
 
         if (userData.isPresent()) {
             User user = userData.get();
@@ -95,6 +97,8 @@ public class UsersApiController implements UsersApi {
             Address newAddress = editUser.getAddress();
             newAddress.setId(address.getId());
             user.setAddress(newAddress);
+
+
             addressService.addAddress(user.getAddress()); //save address first before saving user
 
             return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
@@ -106,21 +110,11 @@ public class UsersApiController implements UsersApi {
     @PutMapping("/users")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
-        //todo get user from db with information from securitycontext, same at editUser()
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //get logged user information
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByUsername(auth.getName());
 
-        user.setEmail(editUser.getEmail());
-        user.setPhoneNumber(editUser.getPhoneNumber());
-
-        Address address = user.getAddress();//todo check if this can be done better lol
-        Address newAddress = editUser.getAddress();
-        newAddress.setId(address.getId());
-        user.setAddress(newAddress);
-        addressService.addAddress(user.getAddress()); //save address first before saving user
-
-        return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
-
+        return new ResponseEntity<>(userService.editUserCustomer(editUser, user), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")

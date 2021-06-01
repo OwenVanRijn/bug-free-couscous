@@ -1,5 +1,6 @@
 package io.swagger.services;
 
+import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.model.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -21,6 +22,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AddressService addressService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -61,6 +65,20 @@ public class UserService {
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Login failed");
         }
+    }
+
+    public User editUserCustomer(CustomerEditUserDTO editUserDTO, User user) {
+        editUserDTO.fillEmpty(user);
+
+        System.out.println(editUserDTO.getAddress().toString());
+
+        user.setEmail(editUserDTO.getEmail());
+        user.setPhoneNumber(editUserDTO.getPhoneNumber());
+        user.setAddress(editUserDTO.getAddressObj(user.getAddress()));
+
+        addressService.addAddress(user.getAddress());
+
+        return userRepository.save(user);
     }
 
 }

@@ -3,6 +3,7 @@ package io.swagger.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.Address;
 import io.swagger.model.CustomerUserUpdate;
+import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.Valid;
@@ -15,7 +16,7 @@ public class CustomerEditUserDTO {
     private String phoneNumber = null;
 
     @JsonProperty("Address")
-    private Address address = null;
+    private AddressPutDTO address = null;
 
     public CustomerEditUserDTO email(String email) {
         this.email = email;
@@ -55,7 +56,7 @@ public class CustomerEditUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public CustomerEditUserDTO address(Address address) {
+    public CustomerEditUserDTO address(AddressPutDTO address) {
         this.address = address;
         return this;
     }
@@ -67,11 +68,28 @@ public class CustomerEditUserDTO {
     @Schema(description = "")
 
     @Valid
-    public Address getAddress() {
+    public AddressPutDTO getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(AddressPutDTO address) {
         this.address = address;
+    }
+
+    public void fillEmpty(User src) {
+        if(email == null) {
+            email = src.getEmail();
+        }
+
+        if(phoneNumber == null) {
+            phoneNumber = src.getPhoneNumber();
+        }
+
+        address.fillEmpty(src.getAddress());
+    }
+
+    public Address getAddressObj(Address oldAddress) {
+        return oldAddress.city(address.getCity()).country(address.getCountry()).houseNumber(address.getHouseNumber())
+                .postalcode(address.getPostalcode()).street(address.getStreet());
     }
 }
