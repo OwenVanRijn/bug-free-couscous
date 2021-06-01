@@ -4,6 +4,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -27,40 +29,12 @@ public class Limit {
   @GeneratedValue
   private Integer id;
 
-  @JsonProperty("name")
-  private String name = null;
-
   @JsonProperty("limit")
   private Long max = null;
 
   @JsonProperty("current")
+  @Nullable
   private Long current = null;
-
-  public Limit name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * Get name
-   * @return name
-   **/
-  @Schema(example = "AbsoluteLimit", required = true, description = "")
-      @NotNull
-
-    public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Limit limit(Double limit) {
-    Double a = limit * 100;
-    this.max = a.longValue();
-    return this;
-  }
 
   /**
    * Get limit
@@ -84,12 +58,17 @@ public class Limit {
     return this;
   }
 
+  public Limit limit(Double limit) {
+    Double a = limit * 100;
+    this.max = a.longValue();
+    return this;
+  }
+
   /**
    * Get current
    * @return current
    **/
   @Schema(example = "0", required = true, description = "")
-      @NotNull
 
     @Valid
     public Long getCurrent() {
@@ -110,22 +89,21 @@ public class Limit {
       return false;
     }
     Limit limit = (Limit) o;
-    return Objects.equals(this.name, limit.name) &&
+    return
         Objects.equals(this.max, limit.max) &&
         Objects.equals(this.current, limit.current);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, max, current);
+    return Objects.hash(max, current);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Limit {\n");
-    
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+
     sb.append("    limit: ").append(toIndentedString(max)).append("\n");
     sb.append("    current: ").append(toIndentedString(current)).append("\n");
     sb.append("}");

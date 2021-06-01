@@ -10,6 +10,8 @@ import io.swagger.model.Limit;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -83,10 +85,15 @@ public class User   {
   @OneToMany()
   private List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
 
-  @JsonProperty("Limits")
+  @OneToOne
   @Valid
-  @OneToMany()
-  private List<Limit> limits = new ArrayList<Limit>();
+  @Nullable
+  private Limit dailyLimit = null;
+
+  @OneToOne
+  @Valid
+  @Nullable
+  private Limit globalLimit = null;
 
   public User id(Integer id) {
     this.id = id;
@@ -254,31 +261,23 @@ public class User   {
     this.bankAccounts = bankAccounts;
   }
 
-  public User limits(List<Limit> limits) {
-    this.limits = limits;
-    return this;
+  @Nullable
+  public Limit getDailyLimit() {
+    return dailyLimit;
   }
 
-  public User addLimitsItem(Limit limitsItem) {
-    this.limits.add(limitsItem);
-    return this;
+  public void setDailyLimit(@Nullable Limit dailyLimit) {
+    this.dailyLimit = dailyLimit;
   }
 
-  /**
-   * Get limits
-   * @return limits
-   **/
-  @Schema(required = true, description = "")
-      @NotNull
-    @Valid
-    public List<Limit> getLimits() {
-    return limits;
+  @Nullable
+  public Limit getGlobalLimit() {
+    return globalLimit;
   }
 
-  public void setLimits(List<Limit> limits) {
-    this.limits = limits;
+  public void setGlobalLimit(@Nullable Limit globalLimit) {
+    this.globalLimit = globalLimit;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -296,13 +295,12 @@ public class User   {
         Objects.equals(this.phoneNumber, user.phoneNumber) &&
         Objects.equals(this.address, user.address) &&
         Objects.equals(this.role, user.role) &&
-        Objects.equals(this.bankAccounts, user.bankAccounts) &&
-        Objects.equals(this.limits, user.limits);
+        Objects.equals(this.bankAccounts, user.bankAccounts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, role, bankAccounts, limits);
+    return Objects.hash(id, firstName, lastName, email, phoneNumber, address, role, bankAccounts);
   }
 
   @Override
@@ -318,7 +316,6 @@ public class User   {
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    role: ").append(toIndentedString(role)).append("\n");
     sb.append("    bankAccounts: ").append(toIndentedString(bankAccounts)).append("\n");
-    sb.append("    limits: ").append(toIndentedString(limits)).append("\n");
     sb.append("}");
     return sb.toString();
   }

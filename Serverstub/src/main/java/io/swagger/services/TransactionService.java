@@ -84,8 +84,6 @@ public class TransactionService {
             throw new BadRequestException("IBAN to not found!");
         }
 
-        Limit limit = to.getLimit().get(0);
-
         if (t.getType() == Transaction.TypeEnum.TRANSACTION){
             int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
 
@@ -97,16 +95,14 @@ public class TransactionService {
                 throw new BadRequestException("You cannot transfer from saving to saving account");
             }
 
-            from.removeAmount(t.getAmount(), limit.getMax());
+            from.removeAmount(t.getAmount());
             bankaccountService.saveBankAccount(from);
         }
 
         if (t.getType() == Transaction.TypeEnum.WITHDRAW)
-            to.removeAmount(t.getAmount(), limit.getMax());
+            to.removeAmount(t.getAmount());
         else
             to.addAmount(t.getAmount());
-
-        limit.current(to.getAmountDecimal());
 
         bankaccountService.saveBankAccount(to);
 
@@ -119,7 +115,7 @@ public class TransactionService {
 
         if (role == User.RoleEnum.CUSTOMER && performingUser.getBankAccounts()
                 .stream()
-                .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()) || x.getIBAN().equals(tpd.getIbanTo()))) {
+                .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()))) {
             throw new UnauthorisedException();
         }
 

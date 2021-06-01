@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -72,10 +74,9 @@ public class BankAccount   {
   @JsonProperty("amount")
   private Long amount = null;
 
-  @JsonProperty("Limits")
-  @OneToMany()
+  @OneToOne
   @Valid
-  private List<Limit> limit = new ArrayList<Limit>();
+  private Limit balanceMin = null;
 
   @JsonBackReference
   @ManyToOne
@@ -200,24 +201,17 @@ public class BankAccount   {
     this.amount = amount;
   }
 
-  public BankAccount addLimitItem(Limit limitItem) {
-    this.limit.add(limitItem);
+  public Limit getBalanceMin() {
+    return balanceMin;
+  }
+
+  public void setBalanceMin(Limit balanceMin) {
+    this.balanceMin = balanceMin;
+  }
+
+  public BankAccount balanceMin(Limit balanceMin){
+    this.balanceMin = balanceMin;
     return this;
-  }
-
-  /**
-   * Get limit
-   * @return limit
-   **/
-  @Schema(required = true, description = "")
-  @NotNull
-  @Valid
-  public List<Limit> getLimit() {
-    return limit;
-  }
-
-  public void setLimit(List<Limit> limit) {
-    this.limit = limit;
   }
 
   @Override
@@ -233,13 +227,12 @@ public class BankAccount   {
         Objects.equals(this.id, bankAccount.id) &&
         Objects.equals(this.accountType, bankAccount.accountType) &&
         Objects.equals(this.IBAN, bankAccount.IBAN) &&
-        Objects.equals(this.amount, bankAccount.amount) &&
-            Objects.equals(this.limit, bankAccount.limit);
+        Objects.equals(this.amount, bankAccount.amount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, id, accountType, IBAN, amount, limit);
+    return Objects.hash(name, id, accountType, IBAN, amount);
   }
 
   @Override
@@ -252,7 +245,6 @@ public class BankAccount   {
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    limit: ").append(toIndentedString(limit)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -273,12 +265,11 @@ public class BankAccount   {
       this.amount += amount.longValue();
   }
 
-  public void removeAmount(Long amount, Long max) throws RestException {
+  public void removeAmount(Long amount) throws RestException {
     if (amount > 0)
       this.amount -= amount.longValue();
 
-    // TODO: check limit
-    if (this.amount < max)
+    if (this.amount < balanceMin.getMax())
       throw new BadRequestException("Bank accounts cannot go under the limit");
   }
 }

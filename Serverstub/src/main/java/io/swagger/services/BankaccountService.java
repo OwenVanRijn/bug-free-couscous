@@ -49,9 +49,9 @@ public class BankaccountService {
 
     public BankAccount convertToBankaccount(CreateBankaccountDTO bankaccountDTO)
     {
-        User testUser = userRepository.getOne(2); // Only for test purposes, will be changed when working with accounts
+        User testUser = userRepository.getOne(2); // TODO: Only for test purposes, will be changed when working with accounts
         Limit limit = new Limit();
-        limit.name("Absolute Limit").current(00.00).limit(00.00);
+        limit.setMax(0L);
         limitRepository.save(limit);
         BankAccount bankAccount = new BankAccount();
         String Iban = ibanHelper.generateUnusedIban();
@@ -59,7 +59,7 @@ public class BankaccountService {
                 .accountType(bankaccountDTO.getAccountType())
                 .amount(0.00)
                 .IBAN(Iban)
-                .addLimitItem(limit)
+                .balanceMin(limit)
                 .setOwner(testUser);
         return bankAccount;
     }

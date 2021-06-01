@@ -16,6 +16,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {RestException.class})
     protected ResponseEntity<Object> handleRestExceptions(RestException e, WebRequest w){
         ErrorResponseDTO er = new ErrorResponseDTO(e);
+        System.out.printf("[RestException] %s\n", e.getMessage());
         return handleExceptionInternal(e, er, new HttpHeaders(), e.getStatus(), w);
     }
 }
