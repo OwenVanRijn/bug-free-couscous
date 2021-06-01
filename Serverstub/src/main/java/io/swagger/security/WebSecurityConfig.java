@@ -40,13 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.headers().frameOptions().disable(); //enable h2-console
 
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                //.antMatchers("/").permitAll()
-                //.antMatchers("/swagger-ui").permitAll()
-                //.antMatchers("/h2-console/**/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
