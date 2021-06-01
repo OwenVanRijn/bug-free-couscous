@@ -1,9 +1,6 @@
 package io.swagger.configuration;
 
-import io.swagger.model.Address;
-import io.swagger.model.BankAccount;
-import io.swagger.model.Role;
-import io.swagger.model.User;
+import io.swagger.model.*;
 import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.BankAccountRepository;
 import io.swagger.repositories.LimitRepository;
@@ -16,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
@@ -41,10 +39,11 @@ public class MyApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
 
-        User u = initCustomerUser(address);
+        User customer = initCustomerUser(address);
+        User employee = initEmployeeUser(address);
         Limit l = initBankaccountLimit();
         initBankAccount(l);
-        initTransactions(u);
+        initTransactions(customer);
     }
 
     private Address initAddress() {
@@ -61,11 +60,24 @@ public class MyApplicationRunner implements ApplicationRunner {
                 .address(address).email("jamesdean@mail.com");
         customer.setRoles(Arrays.asList(Role.ROLE_CUSTOMER));
 
-        customer.setUsername("niek");
+        customer.setUsername("customer");
         customer.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(customer);
         return customer;
+    }
+
+    private User initEmployeeUser(Address address) {
+        User employee = new User();
+        employee.firstName("Aubrey").lastName("Graham").phoneNumber("0612345678")
+                .address(address).email("aubreygraham@mail.com");
+        employee.setRoles(Arrays.asList(Role.ROLE_EMPLOYEE));
+
+        employee.setUsername("employee");
+        employee.setPassword(passwordEncoder.encode("welkom"));
+
+        userService.addUser(employee);
+        return employee;
     }
     private Limit initBankaccountLimit(){
         Limit limit = new Limit();

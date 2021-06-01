@@ -8,6 +8,7 @@ import io.swagger.exceptions.NotFoundException;
 import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Role;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repositories.TransactionRepository;
@@ -112,9 +113,9 @@ public class TransactionService {
 
     public void createTransaction(TransactionPostDTO tpd, User performingUser) throws RestException {
         // TODO: add IBAN validation
-        User.RoleEnum role = User.RoleEnum.EMPLOYEE; // TODO: change to be based on user
+        Role role = Role.ROLE_EMPLOYEE; // TODO: change to be based on user
 
-        if (role == User.RoleEnum.CUSTOMER && performingUser.getBankAccounts()
+        if (role == Role.ROLE_CUSTOMER && performingUser.getBankAccounts()
                 .stream()
                 .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()) || x.getIBAN().equals(tpd.getIbanTo()))) {
             throw new UnauthorisedException();

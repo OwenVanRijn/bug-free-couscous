@@ -5,6 +5,7 @@ import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.model.Address;
 import io.swagger.model.Login;
+import io.swagger.model.Role;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.AddressService;
@@ -32,6 +33,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +62,9 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
-        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) { //todo check if user email already exists
+        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) {
             return new ResponseEntity<>(null, HttpStatus.CONFLICT); //todo check how to return message or should i change identifier?
         } else {
             User user = mapService.createUser(newUser);
@@ -69,6 +72,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         try {
             userService.deleteById(id);
@@ -78,8 +82,9 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser) {
-        Optional<User> userData = userService.getUserById(2); //todo id will change to id from securitycontext
+        Optional<User> userData = userService.getUserById(id); //todo id will change to id from securitycontext
 
         if (userData.isPresent()) {
             User user = userData.get();
@@ -102,25 +107,23 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
         //todo get user from db with information from securitycontext, same at editUser()
-        Optional<User> userData = userService.getUserById(2); //id will change to id from securitycontext
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //get logged user information
+        User user = userService.getUserByUsername(auth.getName());
 
-        if (userData.isPresent()) {
-            User user = userData.get();
-            user.setEmail(editUser.getEmail());
-            user.setPhoneNumber(editUser.getPhoneNumber());
+        user.setEmail(editUser.getEmail());
+        user.setPhoneNumber(editUser.getPhoneNumber());
 
-            Address address = user.getAddress();//todo check if this can be done better lol
-            Address newAddress = editUser.getAddress();
-            newAddress.setId(address.getId());
-            user.setAddress(newAddress);
-            addressService.addAddress(user.getAddress()); //save address first before saving user
+        Address address = user.getAddress();//todo check if this can be done better lol
+        Address newAddress = editUser.getAddress();
+        newAddress.setId(address.getId());
+        user.setAddress(newAddress);
+        addressService.addAddress(user.getAddress()); //save address first before saving user
 
-            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> getUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         Optional<User> userData = userService.getUserById(id);
         if (userData.isPresent()) {
@@ -133,17 +136,17 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return", schema = @Schema(allowableValues = {}, maximum = "50"
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        //todo check if logged user is customer, if yes -> return own user information else return list
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); //get logged user information
 
-        System.out.println(auth.getName());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<User> users = new ArrayList<>();
 
-
-        try {
-            List<User> users = userService.getAllUsers();
+        if (auth.getAuthorities().toString().equals("[ROLE_CUSTOMER]")) {
+            User user = userService.getUserByUsername(auth.getName());
+            users.add(user);
             return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            users = userService.getAllUsers();
+            return new ResponseEntity<List<User>>(users, HttpStatus.OK);
         }
     }
 }

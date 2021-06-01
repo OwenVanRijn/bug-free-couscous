@@ -49,6 +49,8 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email) { return userRepository.findUserByEmail(email); }
 
+    public User getUserByUsername(String username) { return userRepository.findByUsername(username); }
+
     public void deleteById(Integer id) { userRepository.deleteById(id); }
 
     public String login(String username, String password) {

@@ -31,7 +31,7 @@ public class Login   {
    * Get username
    * @return username
    **/
-  @Schema(example = "niek", required = true, description = "")
+  @Schema(example = "customer", required = true, description = "")
       @NotNull
 
     public String getUsername() {

@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.dto.LoginResponseDTO;
 import io.swagger.model.Login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.UserService;
@@ -47,8 +48,13 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
-    public String login (@RequestBody Login login) {
-        return userService.login(login.getUsername(), login.getPassword());
+    public ResponseEntity<LoginResponseDTO> login (@RequestBody Login login) {
+
+        LoginResponseDTO response = new LoginResponseDTO();
+
+        response.setToken(userService.login(login.getUsername(), login.getPassword()));
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /*public ResponseEntity<String> login(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Login body) {
