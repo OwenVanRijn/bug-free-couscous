@@ -54,8 +54,9 @@ public class TransactionSteps {
     }
 
     @Then("i get http code {int}")
-    public void iGetHttpCode(int arg0) {
-        assert (responseCode == arg0);
+    public void iGetHttpCode(int arg0) throws Exception {
+        if (responseCode != arg0)
+            throw new Exception("Http code does not match");
     }
 
     @And("i get {int} transaction result(s)")
