@@ -73,17 +73,19 @@ public class BankaccountApiController implements BankaccountApi {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User u = userService.getUserByUsername(auth.getName());
             Transaction t = new Transaction();
-            User u = new User();
-            u.firstName("John").lastName("Bond").role(Collections.singletonList(Role.ROLE_EMPLOYEE));
-            t.ibANFrom("NL01INHO0000000001")
-                    .ibANTo(body.getIBAN())
-                    .amount(body.getAmount().longValue())
-                    .performedBy(u);
+            t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmount().longValue()).performedBy(u);
+
+            if (bankaccountService.isAccountTypeSavings(body.getIBAN()))
+            {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
             if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT){
             t.type(Transaction.TypeEnum.DEPOSIT);
-            } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW)
-            {
+            } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
                 t.type(Transaction.TypeEnum.WITHDRAW);
             }
             TransactionDTO transactionDTO= new TransactionDTO(t);
@@ -124,10 +126,16 @@ public class BankaccountApiController implements BankaccountApi {
     public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
         try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
-            bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
-            bankaccountService.saveBankAccount(bankAccount);
-            return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+            if (auth.getAuthorities().contains(Role.ROLE_EMPLOYEE)) {
+                bankAccount = bankaccountService.editAccountEmployee(bankAccount, editBankaccount);
+                return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+            } else if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)){
+                boolean succes = bankaccountService.editAccountCustomer(bankAccount, editBankaccount, auth);
+                if (succes) { return new ResponseEntity<>(bankAccount, HttpStatus.OK); }
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

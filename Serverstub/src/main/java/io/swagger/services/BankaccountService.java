@@ -11,6 +11,8 @@ import io.swagger.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,6 +31,8 @@ public class BankaccountService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired UserService userService;
 
     @Autowired
     private IbanHelper ibanHelper;
@@ -49,7 +53,8 @@ public class BankaccountService {
 
     public BankAccount convertToBankaccount(CreateBankaccountDTO bankaccountDTO)
     {
-        User testUser = userRepository.getOne(2); // TODO: Only for test purposes, will be changed when working with accounts
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userService.getUserByUsername(auth.getName());
         Limit limit = new Limit();
         limit.setMax(0L);
         limitRepository.save(limit);
@@ -60,8 +65,35 @@ public class BankaccountService {
                 .amount(0.00)
                 .IBAN(Iban)
                 .balanceMin(limit)
-                .setOwner(testUser);
+                .setOwner(u);
+        u.addBankAccountsItem(bankAccount);
         return bankAccount;
+    }
+    public boolean isAccountTypeSavings(String Iban)
+    {
+        BankAccount bankAccount = getBankaccountByIBANSafe(Iban).get();
+        return bankAccount.getAccountType() != BankAccount.AccountTypeEnum.CURRENT;
+    }
+    public BankAccount editAccountEmployee(BankAccount bankAccount, CreateBankaccountDTO update)
+    {
+        bankAccount.name(update.getName()).accountType(update.getAccountType());
+        saveBankAccount(bankAccount);
+        return bankAccount;
+    }
+    public boolean editAccountCustomer(BankAccount bankAccount, CreateBankaccountDTO editBankaccount, Authentication auth)
+    {
+        boolean succes = false;
+        User user = userService.getUserByUsername(auth.getName());
+        List<BankAccount> userBankaccounts = user.getBankAccounts();
+        for (BankAccount account: userBankaccounts) {
+            if (account.getIBAN().equals(bankAccount.getIBAN()))
+            {
+                bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
+                saveBankAccount(bankAccount);
+                succes = true;
+            }
+        }
+        return succes;
     }
 }
 

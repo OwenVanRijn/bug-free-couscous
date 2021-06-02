@@ -72,6 +72,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         customer.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(customer);
+        bankAccount.setOwner(customer);
+        bankAccountRepository.save(bankAccount);
         return customer;
     }
 
@@ -106,7 +108,7 @@ public class MyApplicationRunner implements ApplicationRunner {
     private BankAccount initBankAccountCustomer(Limit limit){
         BankAccount bankAccount = new BankAccount();
         bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(IbanHelper.generateIban())
-                .amount(3000.00).name("James Daily Account").balanceMin(limit);
+                .amount(300.00).name("James Daily Account").balanceMin(limit);
         return bankAccountRepository.save(bankAccount);
     }
     private void initTransactions(User customer){
