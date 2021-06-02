@@ -74,7 +74,7 @@ public class EmployeeEditUserDTO {
         return this;
     }
 
-    @Schema(example = "+31 6 12345678")
+    @Schema(example = "0612345678")
     public String getPhoneNumber() {
         return phoneNumber;
     }

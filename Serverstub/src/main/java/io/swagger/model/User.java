@@ -40,8 +40,10 @@ public class User {
     @GeneratedValue
     private Integer id = null;
 
+    @JsonProperty("username")
     private String username;
 
+    @JsonProperty("password")
     private String password;
 
     @JsonProperty("FirstName")
@@ -109,6 +111,19 @@ public class User {
     @Valid
     @Nullable
     private Limit globalLimit = null;
+
+    public User() {
+    }
+
+    public User(String username, String firstName, String lastName, String email, String phoneNumber, Address address, List<Role> roles) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.roles = roles;
+    }
 
     public User id(Integer id) {
         this.id = id;
@@ -191,6 +206,9 @@ public class User {
     }
 
     public void setEmail(String email) {
+        if(!email.contains("@") || !email.contains(".")) {
+            throw new IllegalArgumentException("Not a valid email address");
+        }
         this.email = email;
     }
 
@@ -212,6 +230,9 @@ public class User {
     }
 
     public void setPhoneNumber(String phoneNumber) {
+        if(!phoneNumber.matches("[0-9]+")) {
+            throw new IllegalArgumentException("Not a valid phone number");
+        }
         this.phoneNumber = phoneNumber;
     }
 

@@ -1,6 +1,5 @@
 package io.swagger.repositories;
 
-import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -46,7 +46,7 @@ public class CreateUserDTO {
         this.email = email;
     }
 
-    @Schema(example = "212-5051666")
+    @Schema(example = "2125051666")
     public String getPhoneNumber() {
         return phoneNumber;
     }

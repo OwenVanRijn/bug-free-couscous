@@ -3,24 +3,31 @@ package io.swagger.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.Address;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.lang.Nullable;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 
 public class AddressPutDTO {
 
     @JsonProperty("street")
+    @Nullable
     private String street = null;
 
     @JsonProperty("houseNumber")
+    @Nullable
     private Integer houseNumber = null;
 
     @JsonProperty("postalcode")
+    @Nullable
     private String postalcode = null;
 
     @JsonProperty("city")
+    @Nullable
     private String city = null;
 
     @JsonProperty("country")
+    @Nullable
     private String country = null;
 
     /**
@@ -141,23 +148,23 @@ public class AddressPutDTO {
 
     public void fillEmpty(Address src) {
 
-        if(street.equals("")) {
+        if(street == null) {
             street = src.getStreet();
         }
 
-        if(houseNumber.toString().equals("")) {
+        if(houseNumber == null) {
             houseNumber = src.getHouseNumber();
         }
 
-        if(postalcode.equals("")) {
+        if(postalcode == null) {
             postalcode = src.getPostalcode();
         }
 
-        if(city.equals("")) {
+        if(city == null) {
             city = src.getCity();
         }
 
-        if(country.equals("")) {
+        if(country == null) {
             country = src.getCountry();
         }
     }

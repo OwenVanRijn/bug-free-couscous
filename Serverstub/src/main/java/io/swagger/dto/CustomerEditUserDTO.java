@@ -4,17 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.Address;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;
 
 public class CustomerEditUserDTO {
     @JsonProperty("Email")
+    @Nullable
     private String email = null;
 
     @JsonProperty("PhoneNumber")
+    @Nullable
     private String phoneNumber = null;
 
     @JsonProperty("Address")
+    @Nullable
     private AddressPutDTO address = null;
 
     public CustomerEditUserDTO email(String email) {
@@ -24,6 +28,7 @@ public class CustomerEditUserDTO {
 
     /**
      * Get email
+     *
      * @return email
      **/
     @Schema(example = "james@email.com")
@@ -43,9 +48,10 @@ public class CustomerEditUserDTO {
 
     /**
      * Get phoneNumber
+     *
      * @return phoneNumber
      **/
-    @Schema(example = "+31 6 12345678")
+    @Schema(example = "0612345678")
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -62,6 +68,7 @@ public class CustomerEditUserDTO {
 
     /**
      * Get address
+     *
      * @return address
      **/
     @Schema(description = "")
@@ -76,15 +83,17 @@ public class CustomerEditUserDTO {
     }
 
     public void fillEmpty(User src) {
-        if(email.equals("")) {
+        if (email == null) {
             email = src.getEmail();
         }
 
-        if(phoneNumber.equals("")) {
+        if (phoneNumber == null) {
             phoneNumber = src.getPhoneNumber();
         }
 
-        address.fillEmpty(src.getAddress());
+        if (address != null) {
+            address.fillEmpty(src.getAddress());
+        }
     }
 
     public Address getAddressObj(Address oldAddress) {

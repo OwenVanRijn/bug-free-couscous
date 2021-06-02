@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
         if (userService.getUserByEmail(newUser.getEmail()).isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT); //todo check how to return message or should i change identifier?
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         } else {
             User user = mapService.createUser(newUser);
             return new ResponseEntity<>(user, HttpStatus.CREATED);
@@ -90,6 +91,8 @@ public class UsersApiController implements UsersApi {
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
 
+        System.out.println(editUser.getAddress().toString());
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByUsername(auth.getName());
 
@@ -107,7 +110,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-    public ResponseEntity<?> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit", schema = @Schema(allowableValues = {}, maximum = "50", defaultValue = "50"
+    public ResponseEntity<?> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer page, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit", schema = @Schema(allowableValues = {}, maximum = "50", defaultValue = "50"
     )) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -116,7 +119,7 @@ public class UsersApiController implements UsersApi {
             User user = userService.getUserByUsername(auth.getName());
             return new ResponseEntity<User>(user, HttpStatus.OK);
         } else {
-            return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, offset), HttpStatus.OK);
+            return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, page), HttpStatus.OK);
         }
     }
 }

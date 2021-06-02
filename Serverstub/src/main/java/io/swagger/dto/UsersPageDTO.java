@@ -39,4 +39,13 @@ public class UsersPageDTO {
     public void setUsers(List<UserDTO> users) {
         this.users = users;
     }
+
+    @Override
+    public String toString() {
+        return "UsersPageDTO{" +
+                "totalCount=" + totalCount +
+                ", totalPages=" + totalPages +
+                ", users=" + users +
+                '}';
+    }
 }
