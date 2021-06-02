@@ -7,6 +7,7 @@ import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.BankaccountService;
 import io.swagger.services.TransactionService;
+import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -21,6 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +60,9 @@ public class BankaccountApiController implements BankaccountApi {
     @Autowired
     private TransactionService transactionService;
 
+    @Autowired
+    private UserService userService;
+
     @org.springframework.beans.factory.annotation.Autowired
     public BankaccountApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
@@ -63,6 +70,7 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Employee PUT /api/Bankaccount
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
         try {
             Transaction t = new Transaction();
@@ -88,6 +96,7 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Employee POST /api/Bankaccount
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
             description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount) {
         try{
@@ -99,6 +108,7 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Employee DELETE /api/Bankaccount/{IBAN}
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to delete", required=true,
             schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         try {
@@ -110,6 +120,7 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Employee & Customer PUT /api/Bankaccount/{IBAN}
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
         try{
@@ -123,20 +134,25 @@ public class BankaccountApiController implements BankaccountApi {
     }
 
     // Customer GET /api/Bankaccount
-    public ResponseEntity<Optional<BankAccount>> getBankaccountCustomer() {
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<List<BankAccount>> getBankaccountCustomer() {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User user = userService.getUserByUsername(auth.getName());
+
             String IBAN = "NL01INHO0000000001"; // Needs to become IBAN of customer
-            Optional<BankAccount> bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN);
-            if (!bankAccount.isPresent()){
+            List<BankAccount> bankAccounts = user.getBankAccounts();
+            if (bankAccounts.isEmpty()){
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+            return new ResponseEntity<>(bankAccounts, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Employee GET /api/Bankaccount/{IBAN}
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
             required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         try {

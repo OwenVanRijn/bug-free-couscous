@@ -17,7 +17,7 @@ import javax.validation.constraints.*;
 
 
 public class DepositOrWithdraw   {
-  @JsonProperty("IBAN")
+  @JsonProperty("iban")
   private String IBAN = null;
 
   /**

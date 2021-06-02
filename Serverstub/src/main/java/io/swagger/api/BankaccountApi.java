@@ -105,7 +105,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Optional<BankAccount>> getBankaccountCustomer();
+    ResponseEntity<List<BankAccount>> getBankaccountCustomer();
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the employee to get all the bankaccount information based on the IBAN", security = {

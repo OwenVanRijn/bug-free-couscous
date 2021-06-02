@@ -39,10 +39,11 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
-
-        User customer = initCustomerUser(address);
-        User employee = initEmployeeUser(address);
         Limit l = initBankaccountLimit();
+
+        User customer = initCustomerUser(address, l);
+        User employee = initEmployeeUser(address);
+
         initBankAccount(l);
         initTransactions(customer);
     }
@@ -55,10 +56,11 @@ public class MyApplicationRunner implements ApplicationRunner {
         return addressRepository.save(address);
     }
 
-    private User initCustomerUser(Address address) {
+    private User initCustomerUser(Address address, Limit l) {
         User customer = new User();
+        BankAccount bankAccount = initBankAccountCustomer(l);
         customer.firstName("James").lastName("Dean").phoneNumber("0612345678")
-                .address(address).email("jamesdean@mail.com");
+                .address(address).email("jamesdean@mail.com").addBankAccountsItem(bankAccount);
         customer.setRoles(Arrays.asList(Role.ROLE_CUSTOMER));
 
         customer.setUsername("customer");
@@ -92,6 +94,12 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         return bankAccountRepository.save(bankAccount);
 
+    }
+    private BankAccount initBankAccountCustomer(Limit limit){
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(IbanHelper.generateIban())
+                .amount(3000.00).name("James Daily Account").balanceMin(limit);
+        return bankAccountRepository.save(bankAccount);
     }
     private void initTransactions(User customer){
         for (int i = 0; i < 100; i++){
