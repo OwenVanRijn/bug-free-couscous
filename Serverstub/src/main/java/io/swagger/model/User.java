@@ -2,6 +2,7 @@ package io.swagger.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -32,6 +33,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 
 @Entity
+@Table(name = "user")
 public class User {
     @JsonProperty("id")
     @Id
@@ -94,7 +96,8 @@ public class User {
 
     @JsonProperty("BankAccounts")
     @Valid
-    @OneToMany()
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
 
     @OneToOne
@@ -262,6 +265,7 @@ public class User {
     }
 
     public User addBankAccountsItem(BankAccount bankAccountsItem) {
+        bankAccountsItem.setOwner(this);
         this.bankAccounts.add(bankAccountsItem);
         return this;
     }

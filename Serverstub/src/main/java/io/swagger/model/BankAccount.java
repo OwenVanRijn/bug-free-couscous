@@ -80,7 +80,8 @@ public class BankAccount   {
   private Limit balanceMin = null;
 
   @JsonBackReference
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name="user_id")
   @Nullable
   private User owner = null;
 

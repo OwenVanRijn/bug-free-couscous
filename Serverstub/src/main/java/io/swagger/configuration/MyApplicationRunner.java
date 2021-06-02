@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -36,6 +37,9 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Autowired
     LimitRepository limitRepository;
 
+    @Autowired
+    IbanHelper ibanHelper;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
@@ -44,8 +48,9 @@ public class MyApplicationRunner implements ApplicationRunner {
         User customer = initCustomerUser(address, l);
         User employee = initEmployeeUser(address);
 
-        initBankAccount(l);
+        initBankAccount(l, customer);
         initTransactions(customer);
+        setupTransactionTestEnviroment();
     }
 
     private Address initAddress() {
@@ -87,10 +92,13 @@ public class MyApplicationRunner implements ApplicationRunner {
         limit.limit(00.00);
         return limitRepository.save(limit);
     }
-    private BankAccount initBankAccount(Limit limit){
+    private BankAccount initBankAccount(Limit limit, User owner){
         BankAccount bankAccount = new BankAccount();
         bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN("NL01INHO0000000001")
                 .amount(1500.00).name("The Bank account").balanceMin(limit);
+
+        owner.addBankAccountsItem(bankAccount);
+        userService.addUser(owner);
 
         return bankAccountRepository.save(bankAccount);
 
@@ -112,5 +120,27 @@ public class MyApplicationRunner implements ApplicationRunner {
 
             transactionRepository.save(t);
         }
+    }
+
+    private void setupTransactionTestEnviroment(){
+        Address a = initAddress();
+        User user1 = new User().firstName("User1").lastName("User").phoneNumber("0612345678").address(a).email("user1@user.nl").username("user1").password(passwordEncoder.encode("user1")).role(Collections.singletonList(Role.ROLE_CUSTOMER));
+        User user2 = new User().firstName("User2").lastName("User").phoneNumber("0612345678").address(a).email("user2@user.nl").username("user2").password(passwordEncoder.encode("user2")).role(Collections.singletonList(Role.ROLE_CUSTOMER));
+
+        BankAccount accountUser1 = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(150.00).name("User1 Bank");
+        BankAccount accountUser2 = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User2 Bank");
+        BankAccount accountUser1Saving = new BankAccount().accountType(BankAccount.AccountTypeEnum.SAVINGS).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User1 Saving");
+        user1.addBankAccountsItem(accountUser1);
+        user1.addBankAccountsItem(accountUser1Saving);
+        user2.addBankAccountsItem(accountUser2);
+
+        addressRepository.save(a);
+
+        userService.addUser(user1);
+        userService.addUser(user2);
+
+        bankAccountRepository.save(accountUser1);
+        bankAccountRepository.save(accountUser2);
+        bankAccountRepository.save(accountUser1Saving);
     }
 }

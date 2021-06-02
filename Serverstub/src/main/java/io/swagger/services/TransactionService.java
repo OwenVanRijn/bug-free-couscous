@@ -147,7 +147,7 @@ public class TransactionService {
         if (!performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && performingUser.getBankAccounts()
                 .stream()
                 .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()))) {
-            throw new UnauthorisedException();
+            throw new UnauthorisedException("You do not own the from bankaccount");
         }
 
         Transaction t = tpd.toTransaction(performingUser);
