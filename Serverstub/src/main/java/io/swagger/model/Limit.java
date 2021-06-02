@@ -32,9 +32,8 @@ public class Limit {
   @JsonProperty("limit")
   private Long max = null;
 
-  @JsonProperty("current")
-  @Nullable
-  private Long current = null;
+  @JsonProperty("type")
+  private LimitType type;
 
   /**
    * Get limit
@@ -52,33 +51,29 @@ public class Limit {
     this.max = limit;
   }
 
-  public Limit current(Double current) {
-    Double a = current * 100;
-    this.current = a.longValue();
-    return this;
-  }
-
   public Limit limit(Double limit) {
     Double a = limit * 100;
     this.max = a.longValue();
     return this;
   }
 
-  /**
-   * Get current
-   * @return current
-   **/
-  @Schema(example = "0", required = true, description = "")
-
-    @Valid
-    public Long getCurrent() {
-    return current;
+  public Limit limit(Long limit){
+    this.max = limit;
+    return this;
   }
 
-  public void setCurrent(Long current) {
-    this.current = current;
+  public LimitType getType() {
+    return type;
   }
 
+  public void setType(LimitType type) {
+    this.type = type;
+  }
+
+  public Limit type(LimitType type){
+    this.type = type;
+    return this;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -90,13 +85,12 @@ public class Limit {
     }
     Limit limit = (Limit) o;
     return
-        Objects.equals(this.max, limit.max) &&
-        Objects.equals(this.current, limit.current);
+        Objects.equals(this.max, limit.max);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(max, current);
+    return Objects.hash(max);
   }
 
   @Override
@@ -105,7 +99,6 @@ public class Limit {
     sb.append("class Limit {\n");
 
     sb.append("    limit: ").append(toIndentedString(max)).append("\n");
-    sb.append("    current: ").append(toIndentedString(current)).append("\n");
     sb.append("}");
     return sb.toString();
   }

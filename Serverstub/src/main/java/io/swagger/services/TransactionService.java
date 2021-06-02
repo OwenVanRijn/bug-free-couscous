@@ -121,7 +121,7 @@ public class TransactionService {
             int savingCount = ((from.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0) + ((to.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS) ? 1 : 0);
 
             if (savingCount == 1){
-                if (from.getOwner().getId() != to.getOwner().getId())
+                if (!from.getOwner().getId().equals(to.getOwner().getId()))
                     throw new UnauthorisedException("Trying to transfer to/from save account while not being the owner of it");
             }
             else if (savingCount == 2){

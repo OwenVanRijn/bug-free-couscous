@@ -15,8 +15,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -70,6 +72,16 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public User username(String username){
+        this.username = username;
+        return this;
+    }
+
+    public User password(String password) {
+        this.password = password;
+        return this;
     }
 
     /**
@@ -272,6 +284,9 @@ public class User {
 
     @Nullable
     public Limit getDailyLimit() {
+        if (dailyLimit == null){
+            return LimitType.CUSTOMER_DAILY_TRANSACTIONS.getDefault();
+        }
         return dailyLimit;
     }
 
@@ -281,6 +296,9 @@ public class User {
 
     @Nullable
     public Limit getGlobalLimit() {
+        if (globalLimit == null){
+            return LimitType.CUSTOMER_TRANSACTIONS.getDefault();
+        }
         return globalLimit;
     }
 

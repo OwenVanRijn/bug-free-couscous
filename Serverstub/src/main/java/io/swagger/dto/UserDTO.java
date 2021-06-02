@@ -2,6 +2,7 @@ package io.swagger.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.Address;
+import io.swagger.model.BankAccount;
 import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +22,7 @@ public class UserDTO {
     private String phoneNumber;
     private Address address;
     private List<Role> roles;
+    private List<BankAccount> bankAccounts;
 
     public UserDTO(User user) {
         id = user.getId();
@@ -31,6 +33,7 @@ public class UserDTO {
         phoneNumber = user.getPhoneNumber();
         address = user.getAddress();
         roles = user.getRole();
+        bankAccounts = user.getBankAccounts();
     }
 
     @Schema(example = "1")
@@ -101,5 +104,13 @@ public class UserDTO {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<BankAccount> getBankAccounts() {
+        return bankAccounts;
+    }
+
+    public void setBankAccounts(List<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
 }

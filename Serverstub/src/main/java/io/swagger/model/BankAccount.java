@@ -76,10 +76,12 @@ public class BankAccount   {
 
   @OneToOne
   @Valid
+  @Nullable
   private Limit balanceMin = null;
 
   @JsonBackReference
   @ManyToOne
+  @Nullable
   private User owner = null;
 
   public User getOwner() {
@@ -202,6 +204,9 @@ public class BankAccount   {
   }
 
   public Limit getBalanceMin() {
+    if (balanceMin == null) {
+      return LimitType.BANKACCOUNT_MIN.getDefault();
+    }
     return balanceMin;
   }
 
