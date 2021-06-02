@@ -36,6 +36,8 @@ public class UserDTO {
         bankAccounts = user.getBankAccounts();
     }
 
+    public UserDTO() {}
+
     @Schema(example = "1")
     public Integer getId() {
         return id;
@@ -112,6 +114,8 @@ public class UserDTO {
 
     public void setBankAccounts(List<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +

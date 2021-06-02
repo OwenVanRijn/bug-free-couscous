@@ -21,6 +21,9 @@ public class TransactionDTO {
         performedBy = new PerformingTransactionUserDTO(transaction.getPerformedBy());
     }
 
+    public TransactionDTO() {
+    }
+
     public Long getId() {
         return id;
     }

@@ -275,7 +275,7 @@ public class BankAccount   {
     if (amount > 0)
       this.amount -= amount.longValue();
 
-    if (this.amount < balanceMin.getMax())
+    if (this.amount < getBalanceMin().getMax())
       throw new BadRequestException("Bank accounts cannot go under the limit");
   }
 }

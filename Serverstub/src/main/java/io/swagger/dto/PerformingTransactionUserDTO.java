@@ -15,6 +15,9 @@ public class PerformingTransactionUserDTO {
         role = user.getRole();
     }
 
+    public PerformingTransactionUserDTO() {
+    }
+
     public String getName() {
         return name;
     }

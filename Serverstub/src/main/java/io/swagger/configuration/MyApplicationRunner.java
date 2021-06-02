@@ -144,5 +144,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         bankAccountRepository.save(accountUser1);
         bankAccountRepository.save(accountUser2);
         bankAccountRepository.save(accountUser1Saving);
+
+        Transaction t = new Transaction().type(Transaction.TypeEnum.TRANSACTION).amount(100L).ibANFrom(accountUser1.getIBAN()).ibANTo(accountUser2.getIBAN()).performedBy(user1);
+        transactionRepository.save(t);
     }
 }

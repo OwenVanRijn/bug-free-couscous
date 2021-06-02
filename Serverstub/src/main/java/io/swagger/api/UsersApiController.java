@@ -117,7 +117,7 @@ public class UsersApiController implements UsersApi {
 
         if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
             User user = userService.getUserByUsername(auth.getName());
-            return new ResponseEntity<User>(user, HttpStatus.OK);
+            return new ResponseEntity<UserDTO>(new UserDTO(user), HttpStatus.OK);
         } else {
             return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, page), HttpStatus.OK);
         }

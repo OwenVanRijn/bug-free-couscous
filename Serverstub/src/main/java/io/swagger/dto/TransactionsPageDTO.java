@@ -13,6 +13,9 @@ public class TransactionsPageDTO {
         this.transactions = transactions;
     }
 
+    public TransactionsPageDTO() {
+    }
+
     public Long getTotalCount() {
         return totalCount;
     }
