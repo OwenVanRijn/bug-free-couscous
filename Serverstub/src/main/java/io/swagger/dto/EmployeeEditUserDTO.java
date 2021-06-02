@@ -15,8 +15,7 @@ public class EmployeeEditUserDTO {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private Address address;
-    private List<Role> roles;
+    private AddressPutDTO address;
 
     @JsonIgnore
     private List<BankAccount> bankAccounts;
@@ -84,31 +83,18 @@ public class EmployeeEditUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public EmployeeEditUserDTO address(Address address) {
+    public EmployeeEditUserDTO address(AddressPutDTO address) {
         this.address = address;
         return this;
     }
 
     @Valid
-    public Address getAddress() {
+    public AddressPutDTO getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(AddressPutDTO address) {
         this.address = address;
-    }
-
-    public EmployeeEditUserDTO role(List<Role> roles) {
-        this.roles = roles;
-        return this;
-    }
-
-    public List<Role> getRole() {
-        return roles;
-    }
-
-    public void setRole(List<Role> roles) {
-        this.roles = roles;
     }
 
     public EmployeeEditUserDTO bankAccounts(List<BankAccount> bankAccounts) {
@@ -155,4 +141,28 @@ public class EmployeeEditUserDTO {
         this.limits = limits;
     }
 
+    public void fillEmpty(User src) {
+        if(firstName.equals("")) {
+            firstName = src.getFirstName();
+        }
+
+        if(lastName.equals("")) {
+            lastName = src.getLastName();
+        }
+
+        if(email.equals("")) {
+            email = src.getEmail();
+        }
+
+        if(phoneNumber.equals("")) {
+            phoneNumber = src.getPhoneNumber();
+        }
+
+        address.fillEmpty(src.getAddress());
+    }
+
+    public Address getAddressObj(Address oldAddress) {
+        return oldAddress.city(address.getCity()).country(address.getCountry()).houseNumber(address.getHouseNumber())
+                .postalcode(address.getPostalcode()).street(address.getStreet());
+    }
 }

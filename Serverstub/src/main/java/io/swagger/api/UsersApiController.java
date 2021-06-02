@@ -1,13 +1,12 @@
 package io.swagger.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.dto.AddressPutDTO;
 import io.swagger.dto.CreateUserDTO;
 import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.model.Address;
-import io.swagger.model.Login;
-import io.swagger.model.Role;
 import io.swagger.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.AddressService;
 import io.swagger.services.MapService;
 import io.swagger.services.UserService;
@@ -17,22 +16,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -86,25 +79,13 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser) {
         Optional<User> userData = userService.getUserById(id);
 
-
-
-        if (userData.isPresent()) {
+        if(userData.isPresent()) {
             User user = userData.get();
-            user.firstName(editUser.getFirstName()).lastName(editUser.getLastName()).email(editUser.getEmail())
-                    .phoneNumber(editUser.getPhoneNumber()).role(editUser.getRole());
-
-            Address address = user.getAddress();//todo check if this can be done better lol
-            Address newAddress = editUser.getAddress();
-            newAddress.setId(address.getId());
-            user.setAddress(newAddress);
-
-
-            addressService.addAddress(user.getAddress()); //save address first before saving user
-
-            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(userService.editUserEmployee(editUser, user), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+
     }
 
     @PutMapping("/users")

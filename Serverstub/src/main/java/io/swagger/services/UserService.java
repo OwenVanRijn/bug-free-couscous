@@ -1,6 +1,7 @@
 package io.swagger.services;
 
 import io.swagger.dto.CustomerEditUserDTO;
+import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.model.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -70,8 +71,6 @@ public class UserService {
     public User editUserCustomer(CustomerEditUserDTO editUserDTO, User user) {
         editUserDTO.fillEmpty(user);
 
-        System.out.println(editUserDTO.getAddress().toString());
-
         user.setEmail(editUserDTO.getEmail());
         user.setPhoneNumber(editUserDTO.getPhoneNumber());
         user.setAddress(editUserDTO.getAddressObj(user.getAddress()));
@@ -81,4 +80,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User editUserEmployee(EmployeeEditUserDTO editUserDTO, User user) {
+        editUserDTO.fillEmpty(user);
+
+        user.setFirstName(editUserDTO.getFirstName());
+        user.setLastName(editUserDTO.getLastName());
+        user.setEmail(editUserDTO.getEmail());
+        user.setPhoneNumber(editUserDTO.getPhoneNumber());
+        user.setAddress(editUserDTO.getAddressObj(user.getAddress()));
+
+        addressService.addAddress(user.getAddress());
+
+        return userRepository.save(user);
+    }
 }

@@ -77,11 +77,11 @@ public class CustomerEditUserDTO {
     }
 
     public void fillEmpty(User src) {
-        if(email == null) {
+        if(email.equals("")) {
             email = src.getEmail();
         }
 
-        if(phoneNumber == null) {
+        if(phoneNumber.equals("")) {
             phoneNumber = src.getPhoneNumber();
         }
 
