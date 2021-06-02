@@ -117,7 +117,7 @@ public interface UsersApi {
     @RequestMapping(value = "/users",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<UsersPageDTO> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page" ,schema=@Schema()) @Valid @RequestParam(value = "page", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit" ,schema=@Schema(allowableValues={  }, maximum="50"
+    ResponseEntity<?> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page" ,schema=@Schema()) @Valid @RequestParam(value = "page", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit" ,schema=@Schema(allowableValues={  }, maximum="50"
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
 }

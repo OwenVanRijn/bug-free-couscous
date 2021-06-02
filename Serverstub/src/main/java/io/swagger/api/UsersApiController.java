@@ -107,23 +107,16 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-    public ResponseEntity<UsersPageDTO> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit", schema = @Schema(allowableValues = {}, maximum = "50", defaultValue = "50"
+    public ResponseEntity<?> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit", schema = @Schema(allowableValues = {}, maximum = "50", defaultValue = "50"
     )) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-
-
-       /* if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
+        if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
             User user = userService.getUserByUsername(auth.getName());
-            users.add(user);
-            return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
         } else {
-            users = userService.getAllUsers();
-            return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-        }*/
-
-        return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, offset), HttpStatus.OK);
-
+            return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, offset), HttpStatus.OK);
+        }
     }
 }
