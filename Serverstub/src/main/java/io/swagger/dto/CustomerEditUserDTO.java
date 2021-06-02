@@ -2,7 +2,6 @@ package io.swagger.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.Address;
-import io.swagger.model.CustomerUserUpdate;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -1,11 +1,9 @@
 package io.swagger.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.dto.AddressPutDTO;
-import io.swagger.dto.CreateUserDTO;
-import io.swagger.dto.CustomerEditUserDTO;
-import io.swagger.dto.EmployeeEditUserDTO;
+import io.swagger.dto.*;
 import io.swagger.model.Address;
+import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.services.AddressService;
 import io.swagger.services.MapService;
@@ -109,19 +107,23 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return", schema = @Schema(allowableValues = {}, maximum = "50"
-    )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<UsersPageDTO> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page", schema = @Schema(defaultValue = "1")) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit", schema = @Schema(allowableValues = {}, maximum = "50", defaultValue = "50"
+    )) @Valid @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<User> users = new ArrayList<>();
 
-        if (auth.getAuthorities().toString().equals("[ROLE_CUSTOMER]")) {
+
+
+       /* if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
             User user = userService.getUserByUsername(auth.getName());
             users.add(user);
             return new ResponseEntity<List<User>>(users, HttpStatus.OK);
         } else {
             users = userService.getAllUsers();
             return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-        }
+        }*/
+
+        return new ResponseEntity<UsersPageDTO>(userService.getAllUsers(limit, offset), HttpStatus.OK);
+
     }
 }

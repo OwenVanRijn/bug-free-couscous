@@ -2,10 +2,14 @@ package io.swagger.services;
 
 import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
+import io.swagger.dto.UsersPageDTO;
 import io.swagger.model.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -39,8 +44,15 @@ public class UserService {
     public UserService() {
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public UsersPageDTO getAllUsers(Integer limit, Integer page) {
+        page--;
+        Pageable p = PageRequest.of(page, limit);
+        Page<User> u;
+
+        u = userRepository.getUsers(p);
+
+        return new UsersPageDTO(u.getTotalElements(), u.getTotalPages(),
+                u.get().map(User::toUserDTO).collect(Collectors.toList()));
     }
 
     public User addUser(User user) {
