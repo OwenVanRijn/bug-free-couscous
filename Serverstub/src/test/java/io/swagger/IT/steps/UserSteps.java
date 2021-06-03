@@ -2,6 +2,8 @@ package io.swagger.IT.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.bs.A;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
@@ -13,11 +15,14 @@ import io.swagger.model.Address;
 import io.swagger.model.Role;
 import io.swagger.model.User;
 import io.swagger.models.Response;
+import io.swagger.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.annotation.Target;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -31,10 +36,11 @@ public class UserSteps {
     private HttpHeaders headers = new HttpHeaders();
     private ObjectMapper mapper = new ObjectMapper();
 
-    private UserDTO testUser;
+    private UserDTO newUser;
+    private UserDTO oldUser;
 
-    private int responseCode;
-    private String responseMessage;
+    @Autowired
+    private UserService userService;
 
     private World world;
 
@@ -45,43 +51,33 @@ public class UserSteps {
         this.world = world;
     }
 
-    private World world;
-
-    public UserSteps(World world){
-        this.world = world;
-    }
-
     @And("I get all users")
-    public void iGetAllUsers() throws URISyntaxException {
-        URI uri = new URI(baseUserUrl);
-        HttpEntity<String> entity = new HttpEntity<>(null, headers);
-        UDTOResponseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, UserDTO.class);
-        responseCode = UDTOResponseEntity.getStatusCodeValue();
+    public void iGetAllUsers() throws Exception {
+        world.getRequest(baseUserUrl, UserDTO.class);
     }
 
     @And("I get one User object")
     public void iGetOneUserObject() throws Exception {
-        if (UDTOResponseEntity.getBody() == null)
+        if (world.getLastResponse().getBody() == null)
             throw new Exception("Couldn't get User data");
-        testUser = UDTOResponseEntity.getBody();
+        newUser = (UserDTO) world.getLastResponse().getBody();
     }
 
     @And("I update own email")
-    public void iOwnUpdateInformation() throws URISyntaxException {
-        URI uri = new URI(baseUserUrl);
+    public void iOwnUpdateInformation() throws Exception {
         CustomerEditUserDTO editUser = new CustomerEditUserDTO();
         editUser.setAddress(new AddressPutDTO().city("test").country("test").houseNumber(20).postalcode("test")
         .street("test"));
-        editUser.setEmail("newtest@mail.com");
-        editUser.setPhoneNumber("0612345678");
-        HttpEntity<CustomerEditUserDTO> entity = new HttpEntity<>(editUser, headers);
-        UDTOResponseEntity = restTemplate.exchange(uri, HttpMethod.PUT, entity, UserDTO.class);
-        responseCode = UDTOResponseEntity.getStatusCodeValue();
+        editUser.email("newtest@mail.com").phoneNumber("0612345678");
+
+        world.putRequest(baseUserUrl, UserDTO.class, editUser);
     }
 
     @And("I get updated User email")
-    public void iGetUpdatedUserInformation() {
-       assert UDTOResponseEntity.getBody().getEmail().equals("newtest@mail.com");
+    public void iGetUpdatedUserInformation() throws Exception {
+       if(!newUser.getEmail().equals("newtest@mail.com")){
+            throw new Exception("Email did not update");
+        }
     }
 
     @And("I update own {string} incorrectly")
@@ -97,21 +93,13 @@ public class UserSteps {
         }
         editUser.setAddress(new AddressPutDTO().city("test").country("test").houseNumber(20).postalcode("test")
                 .street("test"));
-        HttpEntity<CustomerEditUserDTO> entity = new HttpEntity<>(editUser, headers);
+        HttpEntity<CustomerEditUserDTO> entity = new HttpEntity<>(editUser, world.getHeaders());
         try {
             UDTOResponseEntity = restTemplate.exchange(uri, HttpMethod.PUT, entity, UserDTO.class);
-            responseCode = UDTOResponseEntity.getStatusCodeValue();
+            world.setLastResponse(UDTOResponseEntity);
         } catch (HttpClientErrorException e) {
-            responseCode = e.getRawStatusCode();
-            responseMessage = e.getResponseBodyAsString();
-            responseMessage = new HttpClientErrorMessageParser(responseMessage).getMessage();
-        }
-    }
+            world.setLastResponseCode(e.getRawStatusCode());
 
-    @And("Http message equals {string}")
-    public void httpMessageEquals(String errorMessage) throws Exception {
-        if (!responseMessage.equals("\"" + errorMessage + "\"")) {
-            throw new Exception("Http message does not match");
         }
     }
 }

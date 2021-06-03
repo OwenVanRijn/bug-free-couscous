@@ -4,12 +4,15 @@ public class HttpClientErrorMessageParser {
 
     private String message;
 
-    public HttpClientErrorMessageParser(String message) {
-        this.message = ParseMessage(message);
+    public HttpClientErrorMessageParser() {
+
     }
 
-    private String ParseMessage(String message) {
-        return message.substring(message.lastIndexOf("\"Not a valid"), message.lastIndexOf(','));
+    public String parseMessage(String message) {
+        System.out.println(message);
+        String m = message.substring(message.indexOf("\"message\":") + 11, message.lastIndexOf(',') - 1);
+        System.out.println(m);
+        return m;
     }
 
     public String getMessage() {

@@ -9,8 +9,10 @@ import java.net.URI;
 public class World {
     private HttpHeaders headers = new HttpHeaders();
     private int lastResponseCode;
+    private String lastResponseErrorMsg;
     private ResponseEntity<?> lastResponse;
     private RestTemplate restTemplate = new RestTemplate();
+    private final HttpClientErrorMessageParser parser = new HttpClientErrorMessageParser();
 
     public HttpHeaders getHeaders() {
         return headers;
@@ -36,9 +38,24 @@ public class World {
         this.lastResponse = lastResponse;
     }
 
+    public String getLastResponseErrorMsg() {
+        return lastResponseErrorMsg;
+    }
+
+    public void setLastResponseErrorMsg(String lastResponseErrorMsg) {
+        this.lastResponseErrorMsg = lastResponseErrorMsg;
+    }
+
     public void matchLastResponse(int code) throws Exception {
         if (lastResponseCode != code)
             throw new Exception(String.format("Http code %d does not match expected %d", lastResponseCode, code));
+    }
+
+    public void matchLastResponseErrorMsg(String errorMessage) throws Exception {
+        System.out.println(lastResponseErrorMsg);
+        if (!lastResponseErrorMsg.equals(errorMessage)) {
+            throw new Exception("Http message does not match");
+        }
     }
 
     public <T> ResponseEntity<T> getRequest(String uri, Class<T> target) throws Exception {
@@ -80,16 +97,18 @@ public class World {
         return exchangeRequest(uri, target, entity, HttpMethod.DELETE);
     }
 
-    private <T> ResponseEntity<T> exchangeRequest(URI uri, Class<T> target, HttpEntity<Object> entity, HttpMethod method){
+    private <T> ResponseEntity<T> exchangeRequest(URI uri, Class<T> target, HttpEntity<Object> entity, HttpMethod method) {
         try {
             ResponseEntity<T> response = restTemplate.exchange(uri, method, entity, target);
             lastResponse = response;
             lastResponseCode = response.getStatusCodeValue();
             return response;
-        }
-        catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
             lastResponse = null;
             lastResponseCode = e.getRawStatusCode();
+            lastResponseErrorMsg = parser.parseMessage(e.getResponseBodyAsString());
+
+            System.out.println(lastResponseErrorMsg);
             return null;
         }
     }
