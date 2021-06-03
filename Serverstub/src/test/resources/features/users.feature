@@ -1,11 +1,12 @@
+#noinspection SpellCheckingInspection
 Feature: User tests
   Scenario: Login is status OK
     When i log in with username "user2" and password "user2"
     Then i get http code 200
 
-  Scenario: Login failed is status FORBIDDEN
-    When I login with username "tester123" and password "welcome123"
-    Then I get http status 403
+  Scenario: Login failed is status UNAUTHORIZED
+    When i log in with username "tester123" and password "wrongpassword"
+    Then i get http code 401
 
   Scenario: Customer gets own information
     When i log in with username "customer" and password "welkom"

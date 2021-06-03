@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.dto.LoginResponseDTO;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.Login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.UserService;
@@ -48,7 +49,7 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
-    public ResponseEntity<LoginResponseDTO> login (@RequestBody Login login) {
+    public ResponseEntity<LoginResponseDTO> login (@RequestBody Login login) throws RestException {
 
         LoginResponseDTO response = new LoginResponseDTO();
 

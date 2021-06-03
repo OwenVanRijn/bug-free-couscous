@@ -28,8 +28,9 @@ public class AuthenticationSteps {
 
         ResponseEntity<LoginPostResponseDTO> loginResponse = world.postRequest(baseLoginUrl, LoginPostResponseDTO.class, login);
 
-        world.matchLastResponse(200);
-        headers.add("Authorization", "Bearer " + loginResponse.getBody().getToken());
-        world.setHeaders(headers);
+        if (world.getLastResponseCode() == 200) {
+            headers.add("Authorization", "Bearer " + loginResponse.getBody().getToken());
+            world.setHeaders(headers);
+        }
     }
 }

@@ -3,6 +3,8 @@ package io.swagger.services;
 import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.dto.UsersPageDTO;
+import io.swagger.exceptions.RestException;
+import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.security.JwtTokenProvider;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,13 +73,13 @@ public class UserService {
 
     public void deleteById(Integer id) { userRepository.deleteById(id); }
 
-    public String login(String username, String password) {
+    public String login(String username, String password) throws UnauthorisedException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByUsername(username);
             return jwtTokenProvider.createToken(username, user.getRole());
-        } catch (AuthenticationException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Login failed");
+        } catch (Exception e) {
+            throw new UnauthorisedException("Failed to login");
         }
     }
 
