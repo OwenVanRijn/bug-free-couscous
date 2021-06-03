@@ -52,7 +52,6 @@ public class World {
     }
 
     public void matchLastResponseErrorMsg(String errorMessage) throws Exception {
-        System.out.println(lastResponseErrorMsg);
         if (!lastResponseErrorMsg.equals(errorMessage)) {
             throw new Exception("Http message does not match");
         }
@@ -102,14 +101,18 @@ public class World {
             ResponseEntity<T> response = restTemplate.exchange(uri, method, entity, target);
             lastResponse = response;
             lastResponseCode = response.getStatusCodeValue();
+
             return response;
         } catch (HttpClientErrorException e) {
             lastResponse = null;
             lastResponseCode = e.getRawStatusCode();
-            lastResponseErrorMsg = parser.parseMessage(e.getResponseBodyAsString());
+            lastResponseErrorMsg = parseMessage(e.getResponseBodyAsString());
 
-            System.out.println(lastResponseErrorMsg);
             return null;
         }
+    }
+
+    public String parseMessage(String message) {
+        return message.substring(message.indexOf("\"message\":") + 11, message.lastIndexOf(',') - 1);
     }
 }

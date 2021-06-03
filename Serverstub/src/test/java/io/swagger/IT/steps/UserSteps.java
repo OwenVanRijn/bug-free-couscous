@@ -81,25 +81,18 @@ public class UserSteps {
     }
 
     @And("I update own {string} incorrectly")
-    public void iUpdateOwnIncorrectly(String field) throws URISyntaxException {
-        URI uri = new URI(baseUserUrl);
+    public void iUpdateOwnIncorrectly(String field) throws Exception {
         CustomerEditUserDTO editUser = new CustomerEditUserDTO();
         if(field.equals("phoneNumber")) {
-            editUser.setPhoneNumber("06152436er");
+            editUser.setPhoneNumber("06152436er");//invalid phone number
             editUser.setEmail("newtest@mail.com");
         } else if (field.equals("email")){
-            editUser.setEmail("invalidmail.nl");
+            editUser.setEmail("invalidmail.nl");//invalid email
             editUser.setPhoneNumber("0612345678");
         }
         editUser.setAddress(new AddressPutDTO().city("test").country("test").houseNumber(20).postalcode("test")
                 .street("test"));
-        HttpEntity<CustomerEditUserDTO> entity = new HttpEntity<>(editUser, world.getHeaders());
-        try {
-            UDTOResponseEntity = restTemplate.exchange(uri, HttpMethod.PUT, entity, UserDTO.class);
-            world.setLastResponse(UDTOResponseEntity);
-        } catch (HttpClientErrorException e) {
-            world.setLastResponseCode(e.getRawStatusCode());
 
-        }
+        world.putRequest(baseUserUrl, UserDTO.class, editUser);
     }
 }

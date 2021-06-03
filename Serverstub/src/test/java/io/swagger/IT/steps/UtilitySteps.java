@@ -17,7 +17,6 @@ public class UtilitySteps {
 
     @And("Http message equals {string}")
     public void httpMessageEquals(String errorMessage) throws Exception {
-        System.out.println(errorMessage);
         world.matchLastResponseErrorMsg(errorMessage);
     }
  }
