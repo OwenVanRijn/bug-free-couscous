@@ -24,15 +24,12 @@ public class AuthenticationSteps {
     @When("i log in with username {string} and password {string}")
     public void iLogInWithUsernameAndPassword(String arg0, String arg1) throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        URI uri = new URI(baseLoginUrl);
         LoginPostDTO login = new LoginPostDTO(arg0, arg1);
 
-        HttpEntity<LoginPostDTO> entity = new HttpEntity<>(login, headers);
-        ResponseEntity<LoginPostResponseDTO> loginResponse = restTemplate.postForEntity(uri, entity, LoginPostResponseDTO.class);
+        ResponseEntity<LoginPostResponseDTO> loginResponse = world.postRequest(baseLoginUrl, LoginPostResponseDTO.class, login);
 
-        assert (loginResponse.getStatusCode() == HttpStatus.OK);
-        headers.remove("Authorization");
+        world.matchLastResponse(200);
         headers.add("Authorization", "Bearer " + loginResponse.getBody().getToken());
-        world.headers = headers;
+        world.setHeaders(headers);
     }
 }
