@@ -38,8 +38,9 @@ public class TransactionSteps {
 
     @And("i get {int} transaction result(s)")
     public void iGetTransactionResult(int arg0) throws Exception {
-        if (((ResponseEntity<TransactionsPageDTO>)world.getLastResponse()).getBody().getTotalCount() != arg0)
-            throw new Exception("Transaction counts are not equal");
+        Long count = ((ResponseEntity<TransactionsPageDTO>)world.getLastResponse()).getBody().getTotalCount();
+        if (count != arg0)
+            throw new Exception(String.format("Transaction count %d does not match expected %d", count, arg0));
     }
 
     @And("i store their {int}(st)(th)(rd)(nd) bank account")
@@ -54,7 +55,7 @@ public class TransactionSteps {
     @Then("confirm that the stored bank account has {double} euro stored")
     public void confirmThatTheStoredBankAccountHasEuroStored(double arg0) throws Exception {
         if (bankAccountList.get(0).getAmountDecimal() != arg0)
-            throw new Exception("Bank decimal amounts are not equal");
+            throw new Exception(String.format("Bank decimal amount %.2f does not match expected %.2f", bankAccountList.get(0).getAmountDecimal(), arg0));
     }
 
     @Then("i create a transaction worth {double} euro")
