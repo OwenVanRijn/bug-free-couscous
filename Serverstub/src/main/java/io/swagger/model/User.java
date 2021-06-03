@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -207,7 +209,7 @@ public class User {
 
     public void setEmail(String email) {
         if(!email.contains("@") || !email.contains(".")) {
-            throw new IllegalArgumentException("Not a valid email address");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Not a valid email address");
         }
         this.email = email;
     }
@@ -231,7 +233,8 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         if(!phoneNumber.matches("[0-9]+")) {
-            throw new IllegalArgumentException("Not a valid phone number");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Not a valid phone number");
+            //throw new IllegalArgumentException("Not a valid phone number");
         }
         this.phoneNumber = phoneNumber;
     }

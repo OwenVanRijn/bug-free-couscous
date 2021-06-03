@@ -5,10 +5,7 @@
  */
 package io.swagger.api;
 
-import io.swagger.dto.CreateUserDTO;
-import io.swagger.dto.CustomerEditUserDTO;
-import io.swagger.dto.EmployeeEditUserDTO;
-import io.swagger.dto.UsersPageDTO;
+import io.swagger.dto.*;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,7 +88,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody CustomerEditUserDTO editUser);
+    ResponseEntity<UserDTO> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody CustomerEditUserDTO editUser);
 
 
     @Operation(summary = "Get a single User", description = "Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email, phone number, address, role, bankaccounts and limits.", security = {

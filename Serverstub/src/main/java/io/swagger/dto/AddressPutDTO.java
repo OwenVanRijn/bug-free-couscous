@@ -45,6 +45,11 @@ public class AddressPutDTO {
         this.street = street;
     }
 
+    public AddressPutDTO street (String street) {
+        this.street = street;
+        return this;
+    }
+
     public AddressPutDTO houseNumber(Integer houseNumber) {
         this.houseNumber = houseNumber;
         return this;

@@ -87,12 +87,12 @@ public class UsersApiController implements UsersApi {
 
     @PutMapping("/users")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
+    public ResponseEntity<UserDTO> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByUsername(auth.getName());
 
-        return new ResponseEntity<>(userService.editUserCustomer(editUser, user), HttpStatus.OK);
+        return new ResponseEntity<UserDTO>(new UserDTO(userService.editUserCustomer(editUser, user)), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
