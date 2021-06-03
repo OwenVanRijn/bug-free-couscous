@@ -1,5 +1,6 @@
 package io.swagger.IT.steps;
 
+import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -96,7 +97,7 @@ public class World {
         return exchangeRequest(uri, target, entity, HttpMethod.DELETE);
     }
 
-    private <T> ResponseEntity<T> exchangeRequest(URI uri, Class<T> target, HttpEntity<Object> entity, HttpMethod method) {
+    private <T> ResponseEntity<T> exchangeRequest(URI uri, Class<T> target, HttpEntity<Object> entity, HttpMethod method) throws Exception {
         try {
             ResponseEntity<T> response = restTemplate.exchange(uri, method, entity, target);
             lastResponse = response;
@@ -112,7 +113,14 @@ public class World {
         }
     }
 
-    public String parseMessage(String message) {
-        return message.substring(message.indexOf("\"message\":") + 11, message.lastIndexOf(',') - 1);
+    public String parseMessage(String message) throws Exception {
+        if (message.equals(""))
+            return "";
+
+        JSONObject json = new JSONObject(message);
+        if (json.has("message"))
+            return json.getString("message");
+
+        return "";
     }
 }

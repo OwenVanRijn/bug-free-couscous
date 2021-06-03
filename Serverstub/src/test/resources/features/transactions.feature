@@ -29,6 +29,15 @@ Feature: Transaction tests
     And i store their 1st bank account
     Then confirm that the stored bank account has 45.00 euro stored
 
+  Scenario: Attempt to create an invalid transaction
+    When i log in with username "user2" and password "user2"
+    And i store their 1st bank account
+    When i log in with username "user1" and password "user1"
+    And i store their 1st bank account
+    When i log in with username "user2" and password "user2"
+    Then i create a transaction worth -5.00 euro
+    Then i get http code 400
+
   Scenario: Confirm that the newly added transaction exists on the other side
     When i log in with username "user1" and password "user1"
     And get all transactions
