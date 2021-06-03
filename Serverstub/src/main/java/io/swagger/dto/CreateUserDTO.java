@@ -8,7 +8,8 @@ public class CreateUserDTO {
 
     private String firstName;
     private String lastName;
-    //todo add username and password
+    private String username;
+    private String password;
     private String email;
     private String phoneNumber;
     private String street;
@@ -98,6 +99,24 @@ public class CreateUserDTO {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Schema(example = "saywer123")
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Schema(example = "welkom")
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public CreateUserDTO firstName(String firstName) {

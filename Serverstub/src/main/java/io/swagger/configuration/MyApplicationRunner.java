@@ -44,8 +44,10 @@ public class MyApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
         Limit l = initBankaccountLimit();
+        BankAccount bankAccount = initBankAccountCustomer(l);
 
-        User customer = initCustomerUser(address, l);
+
+        User customer = initCustomerUser(address, bankAccount);
         User employee = initEmployeeUser(address);
 
         initBankAccount(l, customer);
@@ -61,19 +63,18 @@ public class MyApplicationRunner implements ApplicationRunner {
         return addressRepository.save(address);
     }
 
-    private User initCustomerUser(Address address, Limit l) {
+    private User initCustomerUser(Address address, BankAccount b) {
         User customer = new User();
-        BankAccount bankAccount = initBankAccountCustomer(l);
         customer.firstName("James").lastName("Dean").phoneNumber("0612345678")
-                .address(address).email("jamesdean@mail.com").addBankAccountsItem(bankAccount);
-        customer.setRoles(Arrays.asList(Role.ROLE_CUSTOMER));
+                .address(address).email("jamesdean@mail.com").addBankAccountsItem(b);
+        customer.setRoles(Collections.singletonList(Role.ROLE_CUSTOMER));
 
         customer.setUsername("customer");
         customer.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(customer);
-        bankAccount.setOwner(customer);
-        bankAccountRepository.save(bankAccount);
+        b.setOwner(customer);
+        bankAccountRepository.save(b);
         return customer;
     }
 

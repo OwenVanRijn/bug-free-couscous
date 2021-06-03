@@ -56,12 +56,10 @@ public class UsersApiController implements UsersApi {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
-        if (userService.getUserByEmail(newUser.getEmail()).isPresent()) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        } else {
-            User user = mapService.createUser(newUser);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        }
+
+        User u = mapService.createUser(newUser);
+
+        return new ResponseEntity<>(u, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
@@ -90,8 +88,6 @@ public class UsersApiController implements UsersApi {
     @PutMapping("/users")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<User> editUserCustomer(@Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required = true, schema = @Schema()) @Valid @RequestBody CustomerEditUserDTO editUser) {
-
-        System.out.println(editUser.getAddress().toString());
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByUsername(auth.getName());

@@ -4,29 +4,17 @@ import io.swagger.dto.UsersPageDTO;
 import io.swagger.model.Address;
 import io.swagger.model.Role;
 import io.swagger.model.User;
-import io.swagger.repositories.AddressRepository;
-import io.swagger.repositories.UserRepository;
-import io.swagger.services.AddressService;
-import io.swagger.services.BankaccountService;
-import io.swagger.services.TransactionService;
-import io.swagger.services.UserService;
-import org.junit.Before;
+import io.swagger.repositories.*;
+import io.swagger.services.*;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,8 +39,19 @@ public class UsersApiControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private UserService userService;
+    @MockBean private UserService userService;
+    @MockBean private AddressService addressService;
+    @MockBean private BankaccountService bankaccountService;
+    @MockBean private TransactionService transactionService;
+    @MockBean private MyUserDetailsService myUserDetailsService;
+    @MockBean private IbanHelper ibanHelper;
+    @MockBean private MapService mapService;
+    @MockBean private AddressRepository addressRepository;
+    @MockBean private BankAccountRepository bankAccountRepository;
+    @MockBean private LimitRepository limitRepository;
+    @MockBean private TransactionRepository transactionRepository;
+    @MockBean private UserRepository userRepository;
+
 
     private User testUser;
     private String jwt;
