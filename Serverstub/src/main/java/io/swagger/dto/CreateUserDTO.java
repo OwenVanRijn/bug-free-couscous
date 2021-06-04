@@ -1,6 +1,8 @@
 package io.swagger.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.RestException;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonPropertyOrder(alphabetic = false)
@@ -172,5 +174,17 @@ public class CreateUserDTO {
     public CreateUserDTO password(String password) {
         this.password = password;
         return this;
+    }
+
+    public void validate() throws RestException {
+        if (firstName == null || lastName == null || username == null || password == null || email == null || country == null
+        || phoneNumber == null || street == null || houseNumber == null || postalcode == null || city == null) {
+            throw new BadRequestException("Not all User info is set");
+        }
+
+        if (firstName.equals("") || lastName.equals("") || username.equals("") || password.equals("") || email.equals("")
+                || country.equals("") || phoneNumber.equals("") || street.equals("") || postalcode.equals("") || city.equals("")) {
+            throw new BadRequestException("Not all User info is valid");
+        }
     }
 }

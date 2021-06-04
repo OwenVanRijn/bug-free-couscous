@@ -150,11 +150,11 @@ public class EmployeeEditUserDTO {
     }
 
     public void fillEmpty(User src) {
-        if(firstName == null) {
+        if(firstName == null || firstName.equals("")) {
             firstName = src.getFirstName();
         }
 
-        if(lastName == null) {
+        if(lastName == null || lastName.equals("")) {
             lastName = src.getLastName();
         }
 
@@ -162,7 +162,7 @@ public class EmployeeEditUserDTO {
             phoneNumber = src.getPhoneNumber();
         }
 
-        if(email == null) {
+        if(email == null || email.equals("")) {
             email = src.getEmail();
         }
 

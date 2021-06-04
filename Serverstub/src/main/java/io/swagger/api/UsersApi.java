@@ -46,7 +46,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO newUser);
+    ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO newUser) throws RestException;
 
 
     @Operation(summary = "Delete a User by id", description = "The Employee can delete a User with the User Id.", security = {
