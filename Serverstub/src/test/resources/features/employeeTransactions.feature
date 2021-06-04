@@ -75,7 +75,6 @@ Feature: employee transaction tests
   #
   #  Error handling checks
   #
-
   Scenario: Testing if an empty PUT request fails
     When i log in with username "employee" and password "welkom"
     And i get the latest transaction
@@ -85,7 +84,12 @@ Feature: employee transaction tests
 
   Scenario: Testing if an invalid id on an edit request fails
     When i log in with username "employee" and password "welkom"
-    And i create a request with not a valid id
+    And i create an edit request with not a valid id
+    Then i get http code 404
+
+  Scenario: Testing if an invalid id on a delete request fails
+    When i log in with username "employee" and password "welkom"
+    And i create a delete request with not a valid id
     Then i get http code 404
 
   Scenario: Testing if an employee can send a transaction from the internal bank account

@@ -91,7 +91,7 @@ public class TransactionSteps {
         );
     }
 
-    @And("i store an invalid iban")
+    @And("i store a non-existent iban")
     public void iStoreAnInvalidIban() {
         BankaccountDTO b = new BankaccountDTO();
         b.setIban(IbanHelper.generateIban());
@@ -155,7 +155,7 @@ public class TransactionSteps {
         world.putRequest(url, String.class, "{}");
     }
 
-    @And("i create a request with not a valid id")
+    @And("i create an edit request with not a valid id")
     public void iCreateARequestWithNotAValidId() throws Exception {
         String url = baseTransactionUrl + "/" + 0;
         world.putRequest(url, String.class, "{}");
@@ -166,5 +166,11 @@ public class TransactionSteps {
         BankaccountDTO b = new BankaccountDTO();
         b.setIban(arg0);
         bankAccountList.add(b);
+    }
+
+    @And("i create a delete request with not a valid id")
+    public void iCreateADeleteRequestWithNotAValidId() throws Exception {
+        String url = baseTransactionUrl + "/" + 0;
+        world.deleteRequest(url, String.class, null);
     }
 }

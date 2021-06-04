@@ -82,7 +82,7 @@ Feature: Customer transaction tests
     
   Scenario: Filter on invalid iban
     When i log in with username "user1" and password "user1"
-    And i store an invalid iban
+    And i store a non-existent iban
     And i get filtered transactions on iban
     Then i get http code 200
     And i get 0 transaction results
@@ -107,16 +107,16 @@ Feature: Customer transaction tests
 
   Scenario: sending money from an invalid iban
     When i log in with username "user2" and password "user2"
-    And i store an invalid iban
+    And i store a non-existent iban
     And i store their 1st bank account
     And i create a transaction worth 5.00 euro
     Then i get http code 401
     # And Http message equals "You do not own the from bankaccount" # this test does not give a response??
 
-  Scenario: sending money to an invalid iban
+  Scenario: sending money to an non-existent iban
     When i log in with username "user2" and password "user2"
     And i store their 1st bank account
-    And i store an invalid iban
+    And i store a non-existent iban
     And i create a transaction worth 5.00 euro
     Then i get http code 400
     And Http message equals "IBAN to not found!"
@@ -125,6 +125,24 @@ Feature: Customer transaction tests
     When i log in with username "employee" and password "welkom"
     Then i delete the last 2 transactions
 
-  # TODO: check if customers have access to PUT/DELETE
-  # TODO: check if bad ibans get accepted
+  Scenario: editing a transaction as a customer
+    When i log in with username "user2" and password "user2"
+    And i get the latest transaction
+    And i edit the stored transaction amount to 10.00 euro
+    Then i get http code 403
+
+  Scenario: deleting a transaction as a customer
+    When i log in with username "user2" and password "user2"
+    And i get the latest transaction
+    And i delete the stored transaction
+    Then i get http code 403
+
+  Scenario: creating a transaction to an invalid iban
+    When i log in with username "user2" and password "user2"
+    And i store their 1st bank account
+    And i store a bankaccount with iban "yeet"
+    And i create a transaction worth 10.00 euro
+    Then i get http code 400
+    And Http message equals "Invalid IBAN"
+  
   # TODO: send money from and to saving account
