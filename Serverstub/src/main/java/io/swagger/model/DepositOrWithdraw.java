@@ -109,7 +109,7 @@ public class DepositOrWithdraw   {
   @Schema(example = "2000", required = true, description = "")
       @NotNull
 
-  @Min(0)  public Integer getAmount() {
+  public Integer getAmount() {
     return amount;
   }
 

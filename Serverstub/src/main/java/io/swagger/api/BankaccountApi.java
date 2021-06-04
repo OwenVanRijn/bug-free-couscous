@@ -8,6 +8,7 @@ package io.swagger.api;
 import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.dto.TransactionDTO;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,7 +53,7 @@ public interface BankaccountApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body);
+    ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) throws RestException;
 
 
     @Operation(summary = "create a bankaccount", description = "", security = {
@@ -78,7 +79,7 @@ public interface BankaccountApi {
         @ApiResponse(responseCode = "404", description = "bankaccount not found") })
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to update", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to update", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) throws RestException;
 
 
     @Operation(summary = "Edit a account", description = "Edits a bankaccount based on the provided information. Employees can enter a IBAN to edit all accounts, Customers can only edit their own account", security = {
@@ -92,7 +93,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount);
+    ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) throws RestException;
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the Customer to get their own bankaccount information", security = {
@@ -106,7 +107,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer();
+    ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer() throws RestException;
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the employee to get all the bankaccount information based on the IBAN", security = {
@@ -120,7 +121,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) throws RestException;
 
 }
 

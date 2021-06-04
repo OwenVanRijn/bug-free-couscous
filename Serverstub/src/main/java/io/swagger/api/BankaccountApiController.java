@@ -3,6 +3,7 @@ package io.swagger.api;
 import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.dto.TransactionDTO;
+import io.swagger.exceptions.BadRequestException;
 import io.swagger.exceptions.RestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,30 +70,9 @@ public class BankaccountApiController implements BankaccountApi {
 
     // Employee PUT /api/Bankaccount
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User u = userService.getUserByUsername(auth.getName());
-            Transaction t = new Transaction();
-            t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmount().longValue()).performedBy(u);
-
-            if (bankaccountService.isAccountTypeSavings(body.getIBAN()))
-            {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT){
-            t.type(Transaction.TypeEnum.DEPOSIT);
-            } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
-                t.type(Transaction.TypeEnum.WITHDRAW);
-            }
-            TransactionDTO transactionDTO= new TransactionDTO(t);
-            transactionService.DepositOrWithdraw(t);
-            return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
-        } catch (RestException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<TransactionDTO> completeMoneyFlow(@Parameter(in = ParameterIn.DEFAULT, description = "Complete a deposit or withdraw as an employee", required=true, schema=@Schema()) @Valid @RequestBody DepositOrWithdraw body) throws RestException {
+        TransactionDTO transactionDTO = bankaccountService.DepositOrWithdraw(body);
+        return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
     }
 
     // Employee POST /api/Bankaccount
@@ -111,70 +91,34 @@ public class BankaccountApiController implements BankaccountApi {
     // Employee DELETE /api/Bankaccount/{IBAN}
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to delete", required=true,
-            schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        try {
+            schema=@Schema()) @PathVariable("IBAN") String IBAN) throws RestException {
             bankaccountService.deleteByIBAN(IBAN);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     // Employee & Customer PUT /api/Bankaccount/{IBAN}
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
-            schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
-        try{
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
-            if (auth.getAuthorities().contains(Role.ROLE_EMPLOYEE)) {
-                bankAccount = bankaccountService.editAccountEmployee(bankAccount, editBankaccount);
-                BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
-                return new ResponseEntity<>(BDTO, HttpStatus.OK);
-            } else if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)){
-                boolean succes = bankaccountService.editAccountCustomer(bankAccount, editBankaccount, auth);
-                if (succes) {
-                    BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
-                    return new ResponseEntity<>(BDTO, HttpStatus.OK);
-                }
-            }
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) throws RestException{
+            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new BadRequestException("Invalid Iban!"); }
+            BankaccountDTO BDTO = bankaccountService.editAccount(editBankaccount, IBAN);
+            return new ResponseEntity<>(BDTO, HttpStatus.OK);
     }
 
     // Customer GET /api/Bankaccount
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = userService.getUserByUsername(auth.getName());
-            List<BankAccount> bankAccounts = user.getBankAccounts();
-            List<BankaccountDTO> BDTOS = new ArrayList<>();
-            for (BankAccount account: bankAccounts) {
-                BankaccountDTO BDTO = new BankaccountDTO(account);
-                BDTOS.add(BDTO);
-            }
-            if (BDTOS.isEmpty()){
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
+    public ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer() throws RestException{
+            List<BankaccountDTO> BDTOS = bankaccountService.getBankaccountsCustomer();
             return new ResponseEntity<>(BDTOS, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     // Employee GET /api/Bankaccount/{IBAN}
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
-            required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        try {
+            required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) throws RestException{
+            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new BadRequestException("Invalid Iban!"); }
             BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
             BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
             return new ResponseEntity<>(BDTO, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
