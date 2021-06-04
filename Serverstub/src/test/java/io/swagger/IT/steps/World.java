@@ -3,6 +3,7 @@ package io.swagger.IT.steps;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -104,7 +105,7 @@ public class World {
             lastResponseCode = response.getStatusCodeValue();
 
             return response;
-        } catch (HttpClientErrorException e) {
+        } catch (HttpStatusCodeException e) {
             lastResponse = null;
             lastResponseCode = e.getRawStatusCode();
             lastResponseErrorMsg = parseMessage(e.getResponseBodyAsString());

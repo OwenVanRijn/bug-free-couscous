@@ -103,7 +103,7 @@ public class TransactionSteps {
         Collections.reverse(bankAccountList);
     }
 
-    @And("store the {int}(st)(th)(rd)(nd) bank account's balance")
+    @And("store the {int}(st)(th)(rd)(nd) stored bank account's balance")
     public void storeTheStBankAccountSBalance(int arg0) {
         storedBalance = bankAccountList.get(arg0 - 1).getAmount();
     }
@@ -137,7 +137,7 @@ public class TransactionSteps {
         world.deleteRequest(url, String.class, null);
     }
 
-    @Then("i delete the last {int} transactions")
+    @Then("i delete the last {int} transaction(s)")
     public void iDeleteTheLastTransactions(int arg0) throws Exception {
         ResponseEntity<TransactionsPageDTO> topTransactions = world.getRequest(baseTransactionUrl, TransactionsPageDTO.class);
         for (int i = 0; i < arg0; i++){
@@ -147,5 +147,24 @@ public class TransactionSteps {
                     null
             );
         }
+    }
+
+    @And("i send an edit request with no contents using the stored transaction")
+    public void iSendAnEmptyPUTRequestUsingTheStoredTransaction() throws Exception {
+        String url = baseTransactionUrl + "/" + storedTransaction.getId();
+        world.putRequest(url, String.class, "{}");
+    }
+
+    @And("i create a request with not a valid id")
+    public void iCreateARequestWithNotAValidId() throws Exception {
+        String url = baseTransactionUrl + "/" + 0;
+        world.putRequest(url, String.class, "{}");
+    }
+
+    @And("i store a bankaccount with iban {string}")
+    public void iStoreABankaccountWithIban(String arg0) {
+        BankaccountDTO b = new BankaccountDTO();
+        b.setIban(arg0);
+        bankAccountList.add(b);
     }
 }

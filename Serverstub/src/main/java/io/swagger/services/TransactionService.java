@@ -131,7 +131,7 @@ public class TransactionService {
 
     public void createTransaction(TransactionPostDTO tpd, User performingUser) throws RestException {
         // TODO: add IBAN validation
-        if ((performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && !tpd.getIbanFrom().equals("NL01INHO0000000001")) || performingUser.getBankAccounts()
+        if (!(performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && !tpd.getIbanFrom().equals("NL01INHO0000000001")) && performingUser.getBankAccounts()
                 .stream()
                 .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()))) {
             throw new UnauthorisedException("You do not own the from bankaccount");
@@ -216,6 +216,8 @@ public class TransactionService {
         Optional<Transaction> tOp = transactionRepository.findById(transactionId);
         if (!tOp.isPresent())
             throw new NotFoundException("Id not found");
+
+        tpd.isEmpty();
 
         Transaction t = tOp.get();
 

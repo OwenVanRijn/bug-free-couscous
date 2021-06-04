@@ -156,4 +156,9 @@ public class TransactionPutDTO {
     if (ibanTo == null)
       ibanTo = src.getIbanTo();
   }
+
+  public void isEmpty() throws RestException {
+    if (amount == null && ibanFrom == null && ibanTo == null)
+      throw new ServerErrorException("PutDTO is empty");
+  }
 }

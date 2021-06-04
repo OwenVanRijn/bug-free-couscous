@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// TODO: create TransactionPostDTO tests
+// TODO: create TransactionPutDTO tests
 class TransactionTest {
 
     @Test
