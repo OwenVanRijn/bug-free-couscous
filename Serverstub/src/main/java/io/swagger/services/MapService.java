@@ -1,6 +1,7 @@
 package io.swagger.services;
 
 import io.swagger.dto.CreateUserDTO;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.Address;
 import io.swagger.model.Role;
 import io.swagger.model.User;
@@ -27,7 +28,8 @@ public class MapService {
     @Autowired
     PasswordEncoder encoder;
 
-    public User createUser(CreateUserDTO createUserDTO) {
+    public User createUser(CreateUserDTO createUserDTO) throws RestException {
+        createUserDTO.validate();
         if (userRepository.findUserByEmail(createUserDTO.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email already in use");
         } else {

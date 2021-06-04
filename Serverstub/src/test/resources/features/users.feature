@@ -14,6 +14,12 @@ Feature: User tests
     Then i get http code 200
     And I get one UserDTO object
 
+  Scenario: Employee gets own information
+    When i log in with username "employee" and password "welkom"
+    And I get own information
+    Then i get http code 200
+    And I get one UserDTO object
+
   Scenario: Customer edits own email correctly
     When i log in with username "customer" and password "welkom"
     And I update own email to "newemail@mail.com"
@@ -47,7 +53,7 @@ Feature: User tests
 
   Scenario: Employee creates new User
     When i log in with username "employee" and password "welkom"
-    And I create new User
+    And I create new User "correct"
     Then i get http code 201
     And I get one UserDTO object
 
@@ -57,11 +63,21 @@ Feature: User tests
     Then i get http code 200
     And I get 51 User objects
 
+  Scenario: Employee creates new User with missing fields
+    When i log in with username "employee" and password "welkom"
+    And I create new User "incorrect"
+    Then i get http code 400
+
   Scenario: Employee gets single User
     When i log in with username "employee" and password "welkom"
     And I get a single user by id 4
     Then i get http code 200
     And I get one User object
+
+  Scenario: Employee gets single User with invalid id
+    When i log in with username "employee" and password "welkom"
+    And I get a single user by id 999
+    Then i get http code 404
 
   Scenario: Employee deletes user by id
     When i log in with username "employee" and password "welkom"
@@ -73,10 +89,14 @@ Feature: User tests
     Then I get a single user by id 10
     And i get http code 404
 
+  Scenario: Employee deletes user by invalid id
+    When i log in with username "employee" and password "welkom"
+    And I delete single user by id 999
+    Then i get http code 404
+
   Scenario: Employee edits customers firstname
     When i log in with username "employee" and password "welkom"
     And I update customer with id 15 firstname to "Niek"
     Then i get http code 200
     And I get one UserDTO object
     And I get updated User "firstname", "Niek"
-

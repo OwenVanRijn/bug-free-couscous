@@ -52,7 +52,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) {
+    public ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required = true, schema = @Schema()) @Valid @RequestBody CreateUserDTO newUser) throws RestException {
 
         User u = mapService.createUser(newUser);
 
