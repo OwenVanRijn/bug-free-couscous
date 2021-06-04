@@ -9,6 +9,7 @@ import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.UserDTO;
 import io.swagger.model.BankAccount;
+import io.swagger.services.IbanHelper;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,11 +18,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class TransactionSteps {
     private final String baseTransactionUrl = "http://localhost:8080/api/transaction";
-    private final String baseUserUrl = "http://localhost:8080/api/users";
+    private final String baseUserUrl = "http://localhost:8080/api/user";
 
     private final World world;
 
@@ -81,5 +84,17 @@ public class TransactionSteps {
                 UriComponentsBuilder.fromHttpUrl(baseTransactionUrl).queryParam("IBAN", bankAccountList.get(0).getIBAN()).toUriString(),
                 TransactionsPageDTO.class
         );
+    }
+
+    @And("i store an invalid iban")
+    public void iStoreAnInvalidIban() {
+        BankAccount b = new BankAccount();
+        b.setIBAN(IbanHelper.generateIban());
+        bankAccountList.add(b);
+    }
+
+    @And("reverse the stored bank accounts")
+    public void reverseTheStoredBankAccounts() {
+        Collections.reverse(bankAccountList);
     }
 }

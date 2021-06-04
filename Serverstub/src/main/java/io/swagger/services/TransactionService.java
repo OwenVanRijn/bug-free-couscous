@@ -80,11 +80,9 @@ public class TransactionService {
                 cal.add(Calendar.HOUR, -24);
                 Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(from.getOwner().getId(), cal.getTime());
 
-                assert from.getOwner().getDailyLimit() != null;
                 if (from.getOwner().getDailyLimit().getMax() <= dayCount)
                     throw new BadRequestException("From account has reached the daily transaction limit");
 
-                assert from.getOwner().getGlobalLimit() != null;
                 if (from.getOwner().getGlobalLimit().getMax() <= totalCount)
                     throw new BadRequestException("From account has reached the transaction limit");
             }
@@ -144,7 +142,7 @@ public class TransactionService {
 
     public void createTransaction(TransactionPostDTO tpd, User performingUser) throws RestException {
         // TODO: add IBAN validation
-        if (!performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && performingUser.getBankAccounts()
+        if ((performingUser.getRole().contains(Role.ROLE_EMPLOYEE) && !tpd.getIbanFrom().equals("NL01INHO0000000001")) || performingUser.getBankAccounts()
                 .stream()
                 .noneMatch(x -> x.getIBAN().equals(tpd.getIbanFrom()))) {
             throw new UnauthorisedException("You do not own the from bankaccount");
