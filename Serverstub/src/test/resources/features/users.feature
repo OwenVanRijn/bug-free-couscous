@@ -80,6 +80,3 @@ Feature: User tests
     And I get one UserDTO object
     And I get updated User "firstname", "Niek"
 
-    
-
-   

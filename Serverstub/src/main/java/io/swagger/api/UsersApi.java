@@ -108,8 +108,8 @@ public interface UsersApi {
     ResponseEntity<User> getUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id);
 
 
-    @Operation(summary = "Get a list of Users", description = "The Employee can get a list of all Users, the Customer gets their own account information", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employees", "Customers" })
+    @Operation(summary = "Get a list of Users", description = "The Employee can get a list of all Users", security = {
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Employees" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Array of all bank users", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))) })
     @RequestMapping(value = "/users",
@@ -117,6 +117,22 @@ public interface UsersApi {
         method = RequestMethod.GET)
     ResponseEntity<?> getUsers(@Parameter(in = ParameterIn.QUERY, description = "page" ,schema=@Schema()) @Valid @RequestParam(value = "page", required = false) Integer offset, @Max(50) @Parameter(in = ParameterIn.QUERY, description = "limit" ,schema=@Schema(allowableValues={  }, maximum="50"
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+
+
+    @Operation(summary = "Get a own User information", description = "Returns the following user information from the bank user, this can be a client or an employee; id, first name, last name, email, phone number, address, role, bankaccounts and limits.", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Customers", "Employees" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User data", content = @Content(schema = @Schema(implementation = UserDTO.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden") })
+    @RequestMapping(value = "/user",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<UserDTO> getUser();
 
 }
 
