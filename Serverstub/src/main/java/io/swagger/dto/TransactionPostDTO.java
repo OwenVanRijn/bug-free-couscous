@@ -85,6 +85,9 @@ public class TransactionPostDTO {
   }
 
     public Long getAmountLong() {
+      if (amount == null)
+        return 0L; // who needs error handling anyway
+
       Double a = amount * 100;
       return a.longValue();
     }

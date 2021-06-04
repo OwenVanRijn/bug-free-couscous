@@ -3,10 +3,7 @@ package io.swagger.services;
 import io.swagger.dto.TransactionPostDTO;
 import io.swagger.dto.TransactionPutDTO;
 import io.swagger.dto.TransactionsPageDTO;
-import io.swagger.exceptions.BadRequestException;
-import io.swagger.exceptions.NotFoundException;
-import io.swagger.exceptions.RestException;
-import io.swagger.exceptions.UnauthorisedException;
+import io.swagger.exceptions.*;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Limit;
 import io.swagger.model.Role;
@@ -217,7 +214,9 @@ public class TransactionService {
         if (!tOp.isPresent())
             throw new NotFoundException("Id not found");
 
-        tpd.isEmpty();
+        if (tpd.isEmpty()){
+            throw new BadRequestException("PutDTO is empty");
+        }
 
         Transaction t = tOp.get();
 

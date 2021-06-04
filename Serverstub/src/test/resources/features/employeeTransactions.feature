@@ -80,7 +80,7 @@ Feature: employee transaction tests
     When i log in with username "employee" and password "welkom"
     And i get the latest transaction
     And i send an edit request with no contents using the stored transaction
-    Then i get http code 500
+    Then i get http code 400
     And Http message equals "PutDTO is empty"
 
   Scenario: Testing if an invalid id on an edit request fails

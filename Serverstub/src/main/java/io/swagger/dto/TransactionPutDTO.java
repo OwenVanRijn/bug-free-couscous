@@ -87,11 +87,6 @@ public class TransactionPutDTO {
     return amount;
   }
 
-    public Long getAmountLong() {
-      Double a = amount * 100;
-      return a.longValue();
-    }
-
   public void setAmount(Double amount) {
     this.amount = amount;
   }
@@ -157,8 +152,7 @@ public class TransactionPutDTO {
       ibanTo = src.getIbanTo();
   }
 
-  public void isEmpty() throws RestException {
-    if (amount == null && ibanFrom == null && ibanTo == null)
-      throw new ServerErrorException("PutDTO is empty");
+  public boolean isEmpty() {
+    return (amount == null && ibanFrom == null && ibanTo == null);
   }
 }
