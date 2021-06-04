@@ -49,6 +49,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         User customer = initCustomerUser(address, bankAccount);
         User employee = initEmployeeUser(address);
+        initMoreUsers(address);
 
         initBankAccount(l, customer);
         initTransactions(customer);
@@ -82,13 +83,23 @@ public class MyApplicationRunner implements ApplicationRunner {
         User employee = new User();
         employee.firstName("Aubrey").lastName("Graham").phoneNumber("0612345678")
                 .address(address).email("aubreygraham@mail.com");
-        employee.setRoles(Arrays.asList(Role.ROLE_EMPLOYEE));
+        employee.setRoles(Collections.singletonList(Role.ROLE_EMPLOYEE));
 
         employee.setUsername("employee");
         employee.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(employee);
         return employee;
+    }
+
+    private void initMoreUsers(Address address) {
+        for (int i = 0; i < 46; i++){
+            User u = new User();
+            u.firstName("Test").lastName("Person").phoneNumber("0612345678")
+                    .address(address).email("test@mail.com").role(Collections.singletonList(Role.ROLE_CUSTOMER))
+                    .username("tester" + i).password(passwordEncoder.encode("welkom"));
+            userService.addUser(u);
+        }
     }
     private Limit initBankaccountLimit(){
         Limit limit = new Limit();

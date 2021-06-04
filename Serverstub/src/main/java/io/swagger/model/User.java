@@ -2,10 +2,7 @@ package io.swagger.model;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.UserDTO;
 import io.swagger.model.Address;
@@ -45,7 +42,7 @@ public class User {
     @JsonProperty("username")
     private String username;
 
-    @JsonProperty("password")
+    @JsonIgnore
     private String password;
 
     @JsonProperty("FirstName")
@@ -96,6 +93,7 @@ public class User {
 
     @JsonProperty("Role")
     @ElementCollection(fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Role> roles;
 
     @JsonProperty("BankAccounts")
@@ -147,6 +145,12 @@ public class User {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+
 
     public User firstName(String firstName) {
         this.firstName = firstName;

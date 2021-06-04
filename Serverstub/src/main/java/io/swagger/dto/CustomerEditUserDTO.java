@@ -91,7 +91,8 @@ public class CustomerEditUserDTO {
             phoneNumber = src.getPhoneNumber();
         }
 
-        if (address != null) {
+        if (address == null) {
+            address = new AddressPutDTO();
             address.fillEmpty(src.getAddress());
         }
     }

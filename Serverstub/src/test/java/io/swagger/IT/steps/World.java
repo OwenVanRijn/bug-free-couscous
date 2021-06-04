@@ -54,7 +54,7 @@ public class World {
 
     public void matchLastResponseErrorMsg(String errorMessage) throws Exception {
         if (!lastResponseErrorMsg.equals(errorMessage)) {
-            throw new Exception("Http message does not match");
+            throw new Exception(String.format("Http message %s does not match expected %s", lastResponseErrorMsg, errorMessage));
         }
     }
 

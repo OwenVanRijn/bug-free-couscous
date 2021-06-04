@@ -3,6 +3,7 @@ package io.swagger.services;
 import io.swagger.dto.CustomerEditUserDTO;
 import io.swagger.dto.EmployeeEditUserDTO;
 import io.swagger.dto.UsersPageDTO;
+import io.swagger.exceptions.NotFoundException;
 import io.swagger.exceptions.RestException;
 import io.swagger.exceptions.UnauthorisedException;
 import io.swagger.model.User;
@@ -71,9 +72,15 @@ public class UserService {
 
     public User getUserByUsername(String username) { return userRepository.findByUsername(username); }
 
-    public void deleteById(Integer id) { userRepository.deleteById(id); }
+    public void deleteById(Integer id) throws RestException {
+        try {
+            userRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new NotFoundException("Id not found");
+        }
+    }
 
-    public String login(String username, String password) throws UnauthorisedException {
+    public String login(String username, String password) throws RestException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByUsername(username);

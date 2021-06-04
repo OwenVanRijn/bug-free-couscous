@@ -8,6 +8,7 @@ import io.swagger.repositories.AddressRepository;
 import io.swagger.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,6 +23,9 @@ public class MapService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     public User createUser(CreateUserDTO createUserDTO) {
         if (userRepository.findUserByEmail(createUserDTO.getEmail()).isPresent()) {
@@ -39,7 +43,7 @@ public class MapService {
         Address address = new Address();
         user.firstName(createUserDTO.getFirstName()).lastName(createUserDTO.getLastName()).email(createUserDTO.getEmail())
                 .phoneNumber(createUserDTO.getPhoneNumber())
-                .username(createUserDTO.getUsername()).password(createUserDTO.getPassword());
+                .username(createUserDTO.getUsername()).password(encoder.encode(createUserDTO.getPassword()));
         address.street(createUserDTO.getStreet()).houseNumber(createUserDTO.getHouseNumber()).postalcode(createUserDTO.getPostalcode())
                 .city(createUserDTO.getCity()).country(createUserDTO.getCountry());
         user.setRoles(Collections.singletonList(Role.ROLE_CUSTOMER));

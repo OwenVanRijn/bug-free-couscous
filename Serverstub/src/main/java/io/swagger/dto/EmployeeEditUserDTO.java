@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -11,10 +12,16 @@ import java.util.List;
 
 public class EmployeeEditUserDTO {
 
+    @Nullable
+    @JsonProperty("firstName")
     private String firstName;
+    @Nullable
     private String lastName;
+    @Nullable
     private String email;
+    @Nullable
     private String phoneNumber;
+    @Nullable
     private AddressPutDTO address;
 
     @JsonIgnore
@@ -22,6 +29,7 @@ public class EmployeeEditUserDTO {
 
     @JsonProperty("Limits")
     @Valid
+    @Nullable
     private List<Limit> limits;
 
     public EmployeeEditUserDTO() {
@@ -142,23 +150,26 @@ public class EmployeeEditUserDTO {
     }
 
     public void fillEmpty(User src) {
-        if(firstName.equals("")) {
+        if(firstName == null) {
             firstName = src.getFirstName();
         }
 
-        if(lastName.equals("")) {
+        if(lastName == null) {
             lastName = src.getLastName();
         }
 
-        if(email.equals("")) {
-            email = src.getEmail();
-        }
-
-        if(phoneNumber.equals("")) {
+        if(phoneNumber == null) {
             phoneNumber = src.getPhoneNumber();
         }
 
-        address.fillEmpty(src.getAddress());
+        if(email == null) {
+            email = src.getEmail();
+        }
+
+        if(address == null) {
+            address = new AddressPutDTO();
+            address.fillEmpty(src.getAddress());
+        }
     }
 
     public Address getAddressObj(Address oldAddress) {

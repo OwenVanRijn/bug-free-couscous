@@ -163,4 +163,14 @@ public class CreateUserDTO {
         this.country = country;
         return this;
     }
+
+    public CreateUserDTO username(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public CreateUserDTO password(String password) {
+        this.password = password;
+        return this;
+    }
 }

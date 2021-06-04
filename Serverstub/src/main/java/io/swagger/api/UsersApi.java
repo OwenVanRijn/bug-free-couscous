@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.dto.*;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,7 +46,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO newUser);
+    ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "The CreateUser object only has the fields required to create a User.", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO newUser);
 
 
     @Operation(summary = "Delete a User by id", description = "The Employee can delete a User with the User Id.", security = {
@@ -60,7 +61,7 @@ public interface UsersApi {
         @ApiResponse(responseCode = "403", description = "Forbidden") })
     @RequestMapping(value = "/users/{id}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+    ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id) throws NotFoundException, RestException;
 
 
     @Operation(summary = "Edit the User information", description = "", security = {
@@ -77,7 +78,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<User> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser);
+    ResponseEntity<UserDTO> editUser(@Parameter(in = ParameterIn.PATH, description = "The user id", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "The Employee can edit all User information.", required=true, schema=@Schema()) @Valid @RequestBody EmployeeEditUserDTO editUser);
 
 
     @Operation(summary = "Edit the User information", description = "", security = {

@@ -10,16 +10,16 @@ Feature: User tests
 
   Scenario: Customer gets own information
     When i log in with username "customer" and password "welkom"
-    And I get all users
+    And I get own information
     Then i get http code 200
-    And I get one User object
+    And I get one UserDTO object
 
   Scenario: Customer edits own email correctly
     When i log in with username "customer" and password "welkom"
-    And I update own email
+    And I update own email to "newemail@mail.com"
     Then i get http code 200
-    And I get one User object
-    And I get updated User email
+    And I get one UserDTO object
+    And I get updated User "email", "newemail@mail.com"
     
   Scenario: Customer edits phone number incorrectly
     When i log in with username "customer" and password "welkom"
@@ -32,4 +32,54 @@ Feature: User tests
     And I update own "email" incorrectly
     Then i get http code 422
     And Http message equals "Not a valid email address"
+
+  Scenario: Employee gets all users
+    When i log in with username "employee" and password "welkom"
+    And I get all users
+    Then i get http code 200
+    And I get 50 User objects
+
+  Scenario: Employee gets all users with limited amount
+    When i log in with username "employee" and password "welkom"
+    And I get all users with limit 25
+    Then i get http code 200
+    And I get 25 User objects with 2 page(s)
+
+  Scenario: Employee creates new User
+    When i log in with username "employee" and password "welkom"
+    And I create new User
+    Then i get http code 201
+    And I get one UserDTO object
+
+  Scenario: Employee confirms that User has been added
+    When i log in with username "employee" and password "welkom"
+    And I get all users
+    Then i get http code 200
+    And I get 51 User objects
+
+  Scenario: Employee gets single User
+    When i log in with username "employee" and password "welkom"
+    And I get a single user by id 4
+    Then i get http code 200
+    And I get one User object
+
+  Scenario: Employee deletes user by id
+    When i log in with username "employee" and password "welkom"
+    And I get a single user by id 10
+    Then i get http code 200
+    And I get one User object
+    Then I delete single user by id 10
+    And i get http code 204
+    Then I get a single user by id 10
+    And i get http code 404
+
+  Scenario: Employee edits customers firstname
+    When i log in with username "employee" and password "welkom"
+    And I update customer with id 15 firstname to "Niek"
+    Then i get http code 200
+    And I get one UserDTO object
+    And I get updated User "firstname", "Niek"
+
+    
+
    

@@ -16,6 +16,9 @@ public class UsersPageDTO {
         this.users = users;
     }
 
+    public UsersPageDTO() {
+    }
+
     public Long getTotalCount() {
         return totalCount;
     }
