@@ -5,7 +5,7 @@ Feature: User tests
     Then i get http code 200
 
   Scenario: Login failed is status UNAUTHORIZED
-    When i log in with username "tester123" and password "wrongpassword"
+    When i log in with username "tester123" and password "wrongpassword" and store the result
     Then i get http code 401
 
   Scenario: Customer gets own information

@@ -28,6 +28,18 @@ public class AuthenticationSteps {
 
         ResponseEntity<LoginPostResponseDTO> loginResponse = world.postRequest(baseLoginUrl, LoginPostResponseDTO.class, login);
 
+       world.matchLastResponse(200);
+       headers.add("Authorization", "Bearer " + loginResponse.getBody().getToken());
+       world.setHeaders(headers);
+    }
+
+    @When("i log in with username {string} and password {string} and store the result")
+    public void iLogInWithUsernameAndPasswordAndStoreTheResult(String arg0, String arg1) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        LoginPostDTO login = new LoginPostDTO(arg0, arg1);
+
+        ResponseEntity<LoginPostResponseDTO> loginResponse = world.postRequest(baseLoginUrl, LoginPostResponseDTO.class, login);
+
         if (world.getLastResponseCode() == 200) {
             headers.add("Authorization", "Bearer " + loginResponse.getBody().getToken());
             world.setHeaders(headers);
