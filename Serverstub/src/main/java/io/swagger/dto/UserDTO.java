@@ -11,6 +11,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserDTO {
 
@@ -22,7 +23,7 @@ public class UserDTO {
     private String phoneNumber;
     private Address address;
     private List<Role> roles;
-    private List<BankAccount> bankAccounts;
+    private List<BankaccountDTO> bankAccounts;
 
     public UserDTO(User user) {
         id = user.getId();
@@ -33,7 +34,7 @@ public class UserDTO {
         phoneNumber = user.getPhoneNumber();
         address = user.getAddress();
         roles = user.getRole();
-        bankAccounts = user.getBankAccounts();
+        bankAccounts = user.getBankAccounts().stream().map(BankaccountDTO::new).collect(Collectors.toList());
     }
 
     public UserDTO() {}
@@ -108,11 +109,11 @@ public class UserDTO {
         this.roles = roles;
     }
 
-    public List<BankAccount> getBankAccounts() {
+    public List<BankaccountDTO> getBankAccounts() {
         return bankAccounts;
     }
 
-    public void setBankAccounts(List<BankAccount> bankAccounts) {
+    public void setBankAccounts(List<BankaccountDTO> bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
 

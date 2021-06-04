@@ -5,6 +5,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.swagger.IT.steps.restModels.LoginPostDTO;
 import io.swagger.IT.steps.restModels.LoginPostResponseDTO;
+import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.UserDTO;
@@ -32,7 +33,8 @@ public class TransactionSteps {
         this.world = world;
     }
 
-    private List<BankAccount> bankAccountList = new ArrayList<>();
+    private List<BankaccountDTO> bankAccountList = new ArrayList<>();
+    private double storedBalance = 0;
 
     @And("get all transactions")
     public void getAllTransactions() throws Exception {
@@ -57,8 +59,8 @@ public class TransactionSteps {
 
     @Then("confirm that the stored bank account has {double} euro stored")
     public void confirmThatTheStoredBankAccountHasEuroStored(double arg0) throws Exception {
-        if (bankAccountList.get(0).getAmountDecimal() != arg0)
-            throw new Exception(String.format("Bank decimal amount %.2f does not match expected %.2f", bankAccountList.get(0).getAmountDecimal(), arg0));
+        if (bankAccountList.get(0).getAmount() != arg0)
+            throw new Exception(String.format("Bank decimal amount %.2f does not match expected %.2f", bankAccountList.get(0).getAmount(), arg0));
     }
 
     @Then("i create a transaction worth {double} euro")
@@ -66,8 +68,8 @@ public class TransactionSteps {
         assert (bankAccountList.size() >= 2);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("IBAN_from", bankAccountList.get(0).getIBAN());
-        jsonObject.put("IBAN_to", bankAccountList.get(1).getIBAN());
+        jsonObject.put("IBAN_from", bankAccountList.get(0).getIban());
+        jsonObject.put("IBAN_to", bankAccountList.get(1).getIban());
         jsonObject.put("amount", euro);
 
         world.postRequest(baseTransactionUrl, String.class, jsonObject.toString());
@@ -81,20 +83,25 @@ public class TransactionSteps {
     @And("i get filtered transactions on iban")
     public void iGetFilteredTransactionsOnIban() throws Exception {
         world.getRequest(
-                UriComponentsBuilder.fromHttpUrl(baseTransactionUrl).queryParam("IBAN", bankAccountList.get(0).getIBAN()).toUriString(),
+                UriComponentsBuilder.fromHttpUrl(baseTransactionUrl).queryParam("IBAN", bankAccountList.get(0).getIban()).toUriString(),
                 TransactionsPageDTO.class
         );
     }
 
     @And("i store an invalid iban")
     public void iStoreAnInvalidIban() {
-        BankAccount b = new BankAccount();
-        b.setIBAN(IbanHelper.generateIban());
+        BankaccountDTO b = new BankaccountDTO();
+        b.setIban(IbanHelper.generateIban());
         bankAccountList.add(b);
     }
 
     @And("reverse the stored bank accounts")
     public void reverseTheStoredBankAccounts() {
         Collections.reverse(bankAccountList);
+    }
+
+    @And("store the {int}(st)(th)(rd)(nd) bank account's balance")
+    public void storeTheStBankAccountSBalance(int arg0) {
+        storedBalance = bankAccountList.get(arg0 - 1).getAmount();
     }
 }
