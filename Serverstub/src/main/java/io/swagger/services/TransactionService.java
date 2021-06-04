@@ -19,10 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +56,19 @@ public class TransactionService {
         );
     }
 
-    // iban from is nullable
+    private void verifyLimit(BankAccount b) throws RestException {
+        Long totalCount = transactionRepository.countTransactionsByUser(b.getOwner().getId());
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.HOUR, -24);
+        Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(b.getOwner().getId(), cal.getTime());
+
+        if (b.getOwner().getDailyLimit().getMax() <= dayCount)
+            throw new BadRequestException("From account has reached the daily transaction limit");
+
+        if (b.getOwner().getGlobalLimit().getMax() <= totalCount)
+            throw new BadRequestException("From account has reached the transaction limit");
+    }
+
     // TODO: add force option, only customers should have checked limits
     private void processTransaction(Transaction t) throws RestException {
         // TODO: should we add banks that are outside our presence? should an IBAN that we do not know be valid? Transfers from/to other banks?
@@ -75,16 +84,7 @@ public class TransactionService {
         if (fromOp.isPresent()) {
             from = fromOp.get();
             if (t.getType() == Transaction.TypeEnum.TRANSACTION){
-                Long totalCount = transactionRepository.countTransactionsByUser(from.getOwner().getId());
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.HOUR, -24);
-                Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(from.getOwner().getId(), cal.getTime());
-
-                if (from.getOwner().getDailyLimit().getMax() <= dayCount)
-                    throw new BadRequestException("From account has reached the daily transaction limit");
-
-                if (from.getOwner().getGlobalLimit().getMax() <= totalCount)
-                    throw new BadRequestException("From account has reached the transaction limit");
+                verifyLimit(from);
             }
         }
 
@@ -95,19 +95,8 @@ public class TransactionService {
 
         if (toOp.isPresent()){
             to = toOp.get();
-            if (t.getType() == Transaction.TypeEnum.TRANSACTION){ // TODO: copy pasted, please fix
-                Long totalCount = transactionRepository.countTransactionsByUser(to.getOwner().getId());
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.HOUR, -24);
-                Long dayCount = transactionRepository.countTransactionsByUserBeforeDate(to.getOwner().getId(), cal.getTime());
-
-                assert to.getOwner().getDailyLimit() != null;
-                if (to.getOwner().getDailyLimit().getMax() <= dayCount)
-                    throw new BadRequestException("To account has reached the daily transaction limit");
-
-                assert to.getOwner().getGlobalLimit() != null;
-                if (to.getOwner().getGlobalLimit().getMax() <= totalCount)
-                    throw new BadRequestException("To account has reached the transaction limit");
+            if (t.getType() == Transaction.TypeEnum.TRANSACTION){
+                verifyLimit(to);
             }
         }
         else {
@@ -153,8 +142,15 @@ public class TransactionService {
         transactionRepository.save(t);
     }
 
+    private void RollbackTransactionDiff (List<Transaction> atomic) throws RestException {
+        atomic.forEach(x -> x.swapIban()); // Reverse all transactions
+        for (Transaction t : atomic)
+            processTransaction(t);
+    }
+
     private Transaction applyTransactionDiff(TransactionPostDTO newValue, Transaction oldValue) throws RestException {
         Transaction finishedDiff = oldValue.copy();
+        List<Transaction> atomic = new ArrayList<>();
 
         newValue.toTransaction(new User()); // to validate the dto
 
@@ -168,6 +164,8 @@ public class TransactionService {
 
             finishedDiff.ibANFrom(newValue.getIbanFrom());
             processTransaction(t);
+
+            atomic.add(t);
         }
 
         if (!newValue.getIbanTo().equals(oldValue.getIbanTo())){
@@ -179,7 +177,15 @@ public class TransactionService {
                     .performedBy(new User());
 
             finishedDiff.ibANTo(newValue.getIbanTo());
-            processTransaction(t);
+            try {
+                processTransaction(t);
+            }
+            catch (RestException e){
+                RollbackTransactionDiff(atomic);
+                throw e;
+            }
+
+            atomic.add(t);
         }
 
         if (!newValue.getAmountLong().equals(oldValue.getAmount())){
@@ -193,7 +199,13 @@ public class TransactionService {
             }
 
             t.amount(diff);
-            processTransaction(t);
+            try {
+                processTransaction(t);
+            }
+            catch (RestException e){
+                RollbackTransactionDiff(atomic);
+                throw e;
+            }
             finishedDiff.amount(newValue.getAmountLong());
         }
 
