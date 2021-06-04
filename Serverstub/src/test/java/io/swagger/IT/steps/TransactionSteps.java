@@ -10,6 +10,7 @@ import io.swagger.dto.TransactionDTO;
 import io.swagger.dto.TransactionsPageDTO;
 import io.swagger.dto.UserDTO;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.services.IbanHelper;
 import org.json.JSONObject;
 import org.springframework.http.*;
@@ -35,6 +36,7 @@ public class TransactionSteps {
 
     private List<BankaccountDTO> bankAccountList = new ArrayList<>();
     private double storedBalance = 0;
+    private TransactionDTO storedTransaction = null;
 
     @And("get all transactions")
     public void getAllTransactions() throws Exception {
@@ -103,5 +105,34 @@ public class TransactionSteps {
     @And("store the {int}(st)(th)(rd)(nd) bank account's balance")
     public void storeTheStBankAccountSBalance(int arg0) {
         storedBalance = bankAccountList.get(arg0 - 1).getAmount();
+    }
+
+    @And("i edit the stored transaction amount to {double} euro")
+    public void iEditTheLatestTransactionsAmountToEuro(double euro) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("amount", euro);
+
+        String url = baseTransactionUrl + "/" + storedTransaction.getId();
+
+        world.putRequest(url, String.class, jsonObject.toString());
+    }
+
+    @And("i get the latest transaction")
+    public void iGetTheLatestTransaction() throws Exception {
+        ResponseEntity<TransactionsPageDTO> topTransactions = world.getRequest(baseTransactionUrl, TransactionsPageDTO.class);
+        world.matchLastResponse(200);
+        storedTransaction = topTransactions.getBody().getTransactions().get(0);
+    }
+
+    @Then("the bank balance should have changed by {double} euro")
+    public void theBankBalanceShouldHaveChangedByEuro(double euro) throws Exception {
+        if (storedBalance + euro != bankAccountList.get(0).getAmount())
+            throw new Exception(String.format("Bank balance %.2f does not match expected %.2f", bankAccountList.get(0).getAmount(), storedBalance + euro));
+    }
+
+    @And("i delete the stored transaction")
+    public void iDeleteTheStoredTransaction() throws Exception {
+        String url = baseTransactionUrl + "/" + storedTransaction.getId();
+        world.deleteRequest(url, String.class, null);
     }
 }
