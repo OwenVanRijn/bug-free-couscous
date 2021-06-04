@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionSteps {
     private final String baseTransactionUrl = "http://localhost:8080/api/transaction";
@@ -134,5 +135,17 @@ public class TransactionSteps {
     public void iDeleteTheStoredTransaction() throws Exception {
         String url = baseTransactionUrl + "/" + storedTransaction.getId();
         world.deleteRequest(url, String.class, null);
+    }
+
+    @Then("i delete the last {int} transactions")
+    public void iDeleteTheLastTransactions(int arg0) throws Exception {
+        ResponseEntity<TransactionsPageDTO> topTransactions = world.getRequest(baseTransactionUrl, TransactionsPageDTO.class);
+        for (int i = 0; i < arg0; i++){
+            world.deleteRequest(
+                    baseTransactionUrl + "/" + topTransactions.getBody().getTransactions().get(i).getId(),
+                    String.class,
+                    null
+            );
+        }
     }
 }

@@ -113,3 +113,7 @@ Feature: Customer transaction tests
     And i create a transaction worth 5.00 euro
     Then i get http code 400
     And Http message equals "IBAN to not found!"
+
+  Scenario: clean up the last 2 transactions
+    When i log in with username "employee" and password "welkom"
+    Then i delete the last 2 transactions

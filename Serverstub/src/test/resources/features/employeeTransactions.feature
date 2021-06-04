@@ -28,3 +28,5 @@ Feature: employee transaction tests
   # TODO: scenario: editing a transactions to iban
   # TODO: scenario: editing a transactions from iban, to and amount
   # TODO: scenario: deleting all done transactions in this test
+  # TODO: scenario: create a transaction between user1 and user2
+  # TODO: scenario: create a transaction from bank's account
