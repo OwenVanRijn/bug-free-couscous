@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.model.*;
@@ -64,7 +65,7 @@ public interface BankaccountApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT, description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount);
+    ResponseEntity<BankaccountDTO> createBankaccount(@Parameter(in = ParameterIn.DEFAULT, description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount);
 
 
     @Operation(summary = "Delete a account", description = "Calling this allows the employee to delete a bankaccount", security = {
@@ -91,7 +92,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount);
+    ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields", schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount);
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the Customer to get their own bankaccount information", security = {
@@ -105,7 +106,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<BankAccount>> getBankaccountCustomer();
+    ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer();
 
 
     @Operation(summary = "Get bankaccount information", description = "Calling this allows the employee to get all the bankaccount information based on the IBAN", security = {
@@ -119,7 +120,7 @@ public interface BankaccountApi {
     @RequestMapping(value = "/Bankaccount/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 }
 

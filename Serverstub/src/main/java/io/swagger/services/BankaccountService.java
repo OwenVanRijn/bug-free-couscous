@@ -1,6 +1,8 @@
 package io.swagger.services;
 
 import io.swagger.dto.CreateBankaccountDTO;
+import io.swagger.exceptions.NotFoundException;
+import io.swagger.exceptions.RestException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.DepositOrWithdraw;
 import io.swagger.model.Limit;
@@ -44,7 +46,11 @@ public class BankaccountService {
     public void saveBankAccount(BankAccount b){
         bankAccountRepository.save(b);}
 
-    public void deleteByIBAN(String IBAN) {bankAccountRepository.deleteByIBAN(IBAN);}
+    public void deleteByIBAN(String IBAN) throws RestException
+    {
+        if (!getBankaccountByIBANSafe(IBAN).isPresent()) { throw new NotFoundException(); }
+        bankAccountRepository.deleteByIBAN(IBAN);
+    }
 
     public BankAccount createBankaccount(CreateBankaccountDTO bankaccountDTO){
         BankAccount bankAccount = convertToBankaccount(bankaccountDTO);
@@ -82,7 +88,7 @@ public class BankaccountService {
     }
     public boolean editAccountCustomer(BankAccount bankAccount, CreateBankaccountDTO editBankaccount, Authentication auth)
     {
-        boolean succes = false;
+        boolean success = false;
         User user = userService.getUserByUsername(auth.getName());
         List<BankAccount> userBankaccounts = user.getBankAccounts();
         for (BankAccount account: userBankaccounts) {
@@ -90,10 +96,10 @@ public class BankaccountService {
             {
                 bankAccount.name(editBankaccount.getName()).accountType(editBankaccount.getAccountType());
                 saveBankAccount(bankAccount);
-                succes = true;
+                success = true;
             }
         }
-        return succes;
+        return success;
     }
 }
 

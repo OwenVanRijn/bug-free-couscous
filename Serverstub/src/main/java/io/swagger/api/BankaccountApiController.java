@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.exceptions.RestException;
@@ -39,10 +40,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-06T12:37:01.770Z[GMT]")
 @RestController
@@ -99,11 +97,12 @@ public class BankaccountApiController implements BankaccountApi {
 
     // Employee POST /api/Bankaccount
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<BankAccount> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
+    public ResponseEntity<BankaccountDTO> createBankaccount(@Parameter(in = ParameterIn.DEFAULT,
             description = "Create a bankaccount, this option is employee only", required=true, schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO newBankaccount) {
         try{
         BankAccount bankAccount = bankaccountService.createBankaccount(newBankaccount);
-        return new ResponseEntity<>(bankAccount, HttpStatus.CREATED);
+        BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
+        return new ResponseEntity<>(BDTO, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -123,17 +122,21 @@ public class BankaccountApiController implements BankaccountApi {
 
     // Employee & Customer PUT /api/Bankaccount/{IBAN}
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
-    public ResponseEntity<BankAccount> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
+    public ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) {
         try{
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
             if (auth.getAuthorities().contains(Role.ROLE_EMPLOYEE)) {
                 bankAccount = bankaccountService.editAccountEmployee(bankAccount, editBankaccount);
-                return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+                BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
+                return new ResponseEntity<>(BDTO, HttpStatus.OK);
             } else if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)){
                 boolean succes = bankaccountService.editAccountCustomer(bankAccount, editBankaccount, auth);
-                if (succes) { return new ResponseEntity<>(bankAccount, HttpStatus.OK); }
+                if (succes) {
+                    BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
+                    return new ResponseEntity<>(BDTO, HttpStatus.OK);
+                }
             }
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e){
@@ -143,17 +146,20 @@ public class BankaccountApiController implements BankaccountApi {
 
     // Customer GET /api/Bankaccount
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<BankAccount>> getBankaccountCustomer() {
+    public ResponseEntity<List<BankaccountDTO>> getBankaccountCustomer() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User user = userService.getUserByUsername(auth.getName());
-
-            String IBAN = "NL01INHO0000000001"; // Needs to become IBAN of customer
             List<BankAccount> bankAccounts = user.getBankAccounts();
-            if (bankAccounts.isEmpty()){
+            List<BankaccountDTO> BDTOS = new ArrayList<>();
+            for (BankAccount account: bankAccounts) {
+                BankaccountDTO BDTO = new BankaccountDTO(account);
+                BDTOS.add(BDTO);
+            }
+            if (BDTOS.isEmpty()){
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(bankAccounts, HttpStatus.OK);
+            return new ResponseEntity<>(BDTOS, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -161,17 +167,14 @@ public class BankaccountApiController implements BankaccountApi {
 
     // Employee GET /api/Bankaccount/{IBAN}
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Optional<BankAccount>> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
+    public ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
             required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         try {
-            Optional<BankAccount> bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN);
-            if (!bankAccount.isPresent()){
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(bankAccount, HttpStatus.OK);
+            BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
+            BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
+            return new ResponseEntity<>(BDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
