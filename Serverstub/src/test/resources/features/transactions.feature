@@ -34,6 +34,7 @@ Feature: Customer transaction tests
     Then i clear all stored bank accounts
     And i store their 1st bank account
     Then confirm that the stored bank account has 45.00 euro stored
+    # Maybe check the other bank account too?
 
   Scenario: Confirm that the newly added transaction exists on the other side
     When i log in with username "user1" and password "user1"

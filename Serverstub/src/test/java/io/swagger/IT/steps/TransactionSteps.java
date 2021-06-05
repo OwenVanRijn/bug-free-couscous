@@ -173,4 +173,16 @@ public class TransactionSteps {
         String url = baseTransactionUrl + "/" + 0;
         world.deleteRequest(url, String.class, null);
     }
+
+    @And("i edit the stored transaction amount to {double} euro and change the ibans")
+    public void iEditTheStoredTransactionAmountToEuroAndChangeTheIbans(Double euro) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("amount", euro);
+        jsonObject.put("IBAN_from", bankAccountList.get(0).getIban());
+        jsonObject.put("IBAN_to", bankAccountList.get(1).getIban());
+
+        String url = baseTransactionUrl + "/" + storedTransaction.getId();
+
+        world.putRequest(url, String.class, jsonObject.toString());
+    }
 }

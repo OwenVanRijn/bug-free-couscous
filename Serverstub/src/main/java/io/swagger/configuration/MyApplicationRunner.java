@@ -143,10 +143,12 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         BankAccount accountUser1 = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(150.00).name("User1 Bank");
         BankAccount accountUser2 = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User2 Bank");
+        BankAccount accountUser1_2nd = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User1 2nd Bank");
         BankAccount accountUser2_2nd = new BankAccount().accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(ibanHelper.generateUnusedIban()).amount(100.00).name("User2 2nd Bank");
         BankAccount accountUser1Saving = new BankAccount().accountType(BankAccount.AccountTypeEnum.SAVINGS).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User1 Saving");
         BankAccount accountUser2Saving = new BankAccount().accountType(BankAccount.AccountTypeEnum.SAVINGS).IBAN(ibanHelper.generateUnusedIban()).amount(50.00).name("User2 Saving");
         user1.addBankAccountsItem(accountUser1);
+        user1.addBankAccountsItem(accountUser1_2nd);
         user1.addBankAccountsItem(accountUser1Saving);
         user2.addBankAccountsItem(accountUser2);
         user2.addBankAccountsItem(accountUser2_2nd);
@@ -162,6 +164,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         bankAccountRepository.save(accountUser1Saving);
         bankAccountRepository.save(accountUser2_2nd);
         bankAccountRepository.save(accountUser2Saving);
+        bankAccountRepository.save(accountUser1_2nd);
+
+        // Order user1: bankAccount 1, bankAccountSaving, bankAccount 2
+        // Order user2: bankAccount 1, bankAccount 2, bankAccountSaving
 
         Transaction t = new Transaction().type(Transaction.TypeEnum.TRANSACTION).amount(100L).ibANFrom(accountUser1.getIBAN()).ibANTo(accountUser2.getIBAN()).performedBy(user1);
         transactionRepository.save(t);

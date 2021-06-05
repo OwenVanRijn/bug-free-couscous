@@ -68,9 +68,48 @@ Feature: employee transaction tests
     And get all transactions
     Then i get 102 transaction results
 
-  Scenario: clean up the last transaction
+  # user1#1 should have 140 euro, user2#1 should have 60 at the start of this test. user1#3 should have 50 and user2#2 should have 100 stored
+  Scenario: editing a transactions' amount, ibanFrom and ibanTo
+    # Creating a transaction and storing the current bank balance
+    When i log in with username "user1" and password "user1"
+    And i store their 1st bank account
+    When i log in with username "user2" and password "user2"
+    And i store their 1st bank account
+    And reverse the stored bank accounts
+    And i create a transaction worth 15.00 euro
+    And i clear all stored bank accounts
+    And i store their 2nd bank account
+    When i log in with username "user1" and password "user1"
+    And i store their 3rd bank account
+    And reverse the stored bank accounts
+
+    # Editing the transaction
     When i log in with username "employee" and password "welkom"
-    Then i delete the last 1 transaction
+    And i get the latest transaction
+    And i edit the stored transaction amount to 10.00 euro and change the ibans
+    Then i get http code 200
+
+    # Checking if the edited transaction actually edited the balance
+    When i log in with username "user2" and password "user2"
+    And i clear all stored bank accounts
+    And i store their 1st bank account
+    Then confirm that the stored bank account has 60 euro stored
+    And i clear all stored bank accounts
+    And i store their 2nd bank account
+    Then confirm that the stored bank account has 110 euro stored
+    And i clear all stored bank accounts
+
+    When i log in with username "user1" and password "user1"
+    And i clear all stored bank accounts
+    And i store their 1st bank account
+    Then confirm that the stored bank account has 140 euro stored
+    And i clear all stored bank accounts
+    And i store their 3rd bank account
+    Then confirm that the stored bank account has 40 euro stored
+
+  Scenario: clean up the last 2 transactions
+    When i log in with username "employee" and password "welkom"
+    Then i delete the last 2 transactions
 
   #
   #  Error handling checks
@@ -100,7 +139,3 @@ Feature: employee transaction tests
     When i log in with username "employee" and password "welkom"
     When i create a transaction worth 10 euro
     Then i get http code 401
-
-  # TODO: scenario: editing a transactions from iban
-  # TODO: scenario: editing a transactions to iban
-  # TODO: scenario: editing a transactions from iban, to and amount
