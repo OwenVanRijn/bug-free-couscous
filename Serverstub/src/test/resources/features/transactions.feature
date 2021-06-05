@@ -145,4 +145,12 @@ Feature: Customer transaction tests
     Then i get http code 400
     And Http message equals "Invalid IBAN"
   
-  # TODO: send money from and to saving account
+  Scenario: creating a transaction from and to a saving account
+    When i log in with username "user1" and password "user1"
+    And i store their 2nd bank account
+    When i log in with username "user2" and password "user2"
+    And i store their 3rd bank account
+    And reverse the stored bank accounts
+    And i create a transaction worth 5 euro
+    Then i get http code 400
+    And Http message equals "You cannot transfer from saving to saving account"
