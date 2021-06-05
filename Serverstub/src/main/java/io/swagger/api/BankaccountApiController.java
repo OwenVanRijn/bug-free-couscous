@@ -4,6 +4,7 @@ import io.swagger.dto.BankaccountDTO;
 import io.swagger.dto.CreateBankaccountDTO;
 import io.swagger.dto.TransactionDTO;
 import io.swagger.exceptions.BadRequestException;
+import io.swagger.exceptions.NotFoundException;
 import io.swagger.exceptions.RestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,7 +101,7 @@ public class BankaccountApiController implements BankaccountApi {
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYEE')")
     public ResponseEntity<BankaccountDTO> editBankaccount(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to edit", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "editable fields",
             schema=@Schema()) @Valid @RequestBody CreateBankaccountDTO editBankaccount) throws RestException{
-            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new BadRequestException("Invalid Iban!"); }
+            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new NotFoundException("IBAN not found!"); }
             BankaccountDTO BDTO = bankaccountService.editAccount(editBankaccount, IBAN);
             return new ResponseEntity<>(BDTO, HttpStatus.OK);
     }
@@ -116,7 +117,7 @@ public class BankaccountApiController implements BankaccountApi {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<BankaccountDTO> getBankaccountEmployee(@Parameter(in = ParameterIn.PATH, description = "IBAN of bankaccount to return",
             required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) throws RestException{
-            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new BadRequestException("Invalid Iban!"); }
+            if (!bankaccountService.getBankaccountByIBANSafe(IBAN).isPresent()){ throw new NotFoundException("IBAN not found!"); }
             BankAccount bankAccount = bankaccountService.getBankaccountByIBANSafe(IBAN).get();
             BankaccountDTO BDTO = new BankaccountDTO(bankAccount);
             return new ResponseEntity<>(BDTO, HttpStatus.OK);

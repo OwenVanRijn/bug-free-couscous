@@ -54,7 +54,7 @@ public class DepositOrWithdraw   {
   private TypeEnum type = null;
 
   @JsonProperty("Amount")
-  private Integer amount = null;
+  private Double amount = null;
 
   public DepositOrWithdraw IBAN(String IBAN) {
     this.IBAN = IBAN;
@@ -96,7 +96,7 @@ public class DepositOrWithdraw   {
     this.type = type;
   }
 
-  public DepositOrWithdraw amount(Integer amount) {
+  public DepositOrWithdraw amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -106,14 +106,14 @@ public class DepositOrWithdraw   {
    * minimum: 0
    * @return amount
    **/
-  @Schema(example = "2000", required = true, description = "")
+  @Schema(example = "20.50", required = true, description = "")
       @NotNull
 
-  public Integer getAmount() {
+  public Double getAmount() {
     return amount;
   }
 
-  public void setAmount(Integer amount) {
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
 

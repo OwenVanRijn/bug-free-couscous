@@ -145,7 +145,7 @@ public class BankaccountService {
         Transaction t = new Transaction();
         t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmount().longValue()).performedBy(u);
         if (!getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
-            throw new BadRequestException("Invalid Iban!");
+            throw new NotFoundException("IBAN not found!");
         }
         if (isAccountTypeSavings(body.getIBAN()))
         {
