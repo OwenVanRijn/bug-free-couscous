@@ -4,14 +4,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.swagger.dto.*;
 import io.swagger.model.User;
-import io.swagger.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 
 public class UserSteps {
-    private final String baseLoginUrl = "http://localhost:8080/api/login";
     private final String baseUsersUrl = "http://localhost:8080/api/users";
     private final String baseUserUrl = "http://localhost:8080/api/user";
 
@@ -142,6 +139,4 @@ public class UserSteps {
 
         world.putRequest(baseUsersUrl + "/" + id, UserDTO.class, editUser);
     }
-
-    //todo add customer tries employee function and vise versa
 }
