@@ -144,7 +144,6 @@ public class BankaccountService {
         User u = userService.getUserByUsername(auth.getName());
         Transaction t = new Transaction();
         t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmount().longValue()).performedBy(u);
-
         if (!getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
             throw new NotFoundException("IBAN not found!");
         }
@@ -152,13 +151,9 @@ public class BankaccountService {
         {
             throw new BadRequestException("You cannot Deposit or Withdraw to a savings account!");
         }
-        if (body.getAmount() < 0)
-        {
-            throw new BadRequestException("Amount cannot go under 0!");
-        }
         if (body.getType() == DepositOrWithdraw.TypeEnum.DEPOSIT){
             t.type(Transaction.TypeEnum.DEPOSIT);
-        } else if (body.getType() == DepositOrWithdraw.TypeEnum.WITHDRAW) {
+        } else {
             t.type(Transaction.TypeEnum.WITHDRAW);
         }
         TransactionDTO transactionDTO= new TransactionDTO(t);
