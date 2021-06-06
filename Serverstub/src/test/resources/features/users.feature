@@ -52,13 +52,13 @@ Feature: User tests
     When i log in with username "employee" and password "welkom"
     And I get all users
     Then i get http code 200
-    And I get 50 User objects
+    And I get 51 User objects
 
   Scenario: Employee gets all users with limited amount
     When i log in with username "employee" and password "welkom"
     And I get all users with limit 25
     Then i get http code 200
-    And I get 25 User objects with 2 page(s)
+    And I get 25 User objects with 3 page(s)
 
   Scenario: Employee creates new User
     When i log in with username "employee" and password "welkom"
@@ -70,7 +70,7 @@ Feature: User tests
     When i log in with username "employee" and password "welkom"
     And I get all users
     Then i get http code 200
-    And I get 51 User objects
+    And I get 52 User objects
 
   Scenario: Employee creates new User with missing fields
     When i log in with username "employee" and password "welkom"
