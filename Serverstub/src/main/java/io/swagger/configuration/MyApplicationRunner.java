@@ -106,7 +106,7 @@ public class MyApplicationRunner implements ApplicationRunner {
                 .address(address).email("aubreygraham@mail.com");
         employee.setRoles(Collections.singletonList(Role.ROLE_EMPLOYEE));
 
-        employee.setUsername("employee");
+        employee.setUsername("owner");
         employee.setPassword(passwordEncoder.encode("welkom"));
 
         userService.addUser(employee);
