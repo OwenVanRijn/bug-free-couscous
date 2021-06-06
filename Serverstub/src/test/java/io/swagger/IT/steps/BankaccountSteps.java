@@ -19,7 +19,6 @@ public class BankaccountSteps {
     private final World world;
     private List<BankaccountDTO> bankAccountList;
     private BankaccountDTO BDTO;
-    private BankAccount bankAccount;
 
     public BankaccountSteps(World world) {
         this.world = world;
@@ -140,13 +139,4 @@ public class BankaccountSteps {
             world.putRequest(baseBankaccountUrl + "/" + BDTO.getIban(), BankaccountDTO.class, editBankaccount);
         }
     }
-
-
-//
-//    @And("I get one BankaccountDTO list")
-//    public void iGetOneBankaccountDTOList() throws Exception {
-//        bankAccountList = (List<BankaccountDTO>) world.getLastResponse().getBody();
-//        if (bankAccountList == null)
-//            throw new Exception("Couldn't get customer bankaccounts");
-//    }
 }
