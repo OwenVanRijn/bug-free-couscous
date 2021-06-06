@@ -51,9 +51,10 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         User customer = initCustomerUser(address, current, savings);
         User employee = initEmployeeUser(address, initBankAccountCustomer(null, "current"));
+        User owner = initOwnerUser(address);
         initMoreUsers(address);
 
-        initBankAccount(l, customer);
+        initBankAccount(l, owner);
         initTransactions(customer);
         setupTransactionTestEnviroment();
     }
@@ -96,6 +97,19 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         userService.addUser(employee);
         bankAccountRepository.save(b);
+        return employee;
+    }
+
+    private User initOwnerUser(Address address) {
+        User employee = new User();
+        employee.firstName("Aubrey").lastName("Graham").phoneNumber("0612345678")
+                .address(address).email("aubreygraham@mail.com");
+        employee.setRoles(Collections.singletonList(Role.ROLE_EMPLOYEE));
+
+        employee.setUsername("employee");
+        employee.setPassword(passwordEncoder.encode("welkom"));
+
+        userService.addUser(employee);
         return employee;
     }
 
