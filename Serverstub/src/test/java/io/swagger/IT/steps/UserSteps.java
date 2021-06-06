@@ -13,6 +13,7 @@ public class UserSteps {
     private final String baseUserUrl = "http://localhost:8080/api/user";
 
     private UserDTO newUser;
+    private UserDTO storedUser;
 
     private World world;
 
@@ -114,6 +115,12 @@ public class UserSteps {
         world.postRequest(baseUsersUrl, UserDTO.class, newUser);
     }
 
+    @And("I get a single user by latest user id")
+    public void iGetASingleUserByLatestUserId() throws Exception {
+
+        world.getRequest(baseUsersUrl + "/" + storedUser.getId(), User.class);
+    }
+
     @And("I get a single user by id {int}")
     public void iGetASingleUserById(int id) throws Exception {
         world.getRequest(baseUsersUrl + "/" + id, User.class);
@@ -138,5 +145,12 @@ public class UserSteps {
         editUser.setFirstName(newValue);
 
         world.putRequest(baseUsersUrl + "/" + id, UserDTO.class, editUser);
+    }
+
+    @Then("I get the latest user")
+    public void iGetTheLatestUser() throws Exception {
+        ResponseEntity<UsersPageDTO> users = world.getRequest(baseUsersUrl, UsersPageDTO.class);
+        world.matchLastResponse(200);
+        storedUser = users.getBody().getUsers().get(0);
     }
 }

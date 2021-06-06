@@ -79,7 +79,8 @@ Feature: User tests
 
   Scenario: Employee gets single User
     When i log in with username "employee" and password "welkom"
-    And I get a single user by id 7
+    And I get the latest user
+    And I get a single user by latest user id
     Then i get http code 200
     And I get one User object
 
