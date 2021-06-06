@@ -82,7 +82,7 @@ public class TransactionApiController implements TransactionApi {
 
         User performingUser = null;
 
-        if (auth.getAuthorities().contains(Role.ROLE_CUSTOMER)) {
+        if (!auth.getAuthorities().contains(Role.ROLE_EMPLOYEE)) {
             performingUser = userService.getUserByUsername(auth.getName());
         }
 
