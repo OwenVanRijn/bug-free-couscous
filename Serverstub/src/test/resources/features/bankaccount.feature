@@ -44,17 +44,6 @@ Feature: Bankaccount tests
     And I update bankaccount with Iban "NL09INHO0722376752" name to "updated bankaccount name" and type to "wrong"
     Then i get http code 500
 
-  Scenario: Employee deletes bankaccount
-    When i log in with username "employee" and password "welkom"
-    And I get bankaccount by Iban "NL09INHO0722376752"
-    Then i get http code 200
-    And I get one Bankaccount object
-    Then I delete bankaccount with Iban "NL09INHO0722376752"
-    And i get http code 200
-    Then I get bankaccount by Iban "NL09INHO0722376752"
-    And i get http code 404
-    And Http message equals "IBAN not found!"
-
   Scenario: Employee deletes unknown Iban
     When i log in with username "employee" and password "welkom"
     And I delete bankaccount with Iban "NL01INHO0000001"
@@ -150,3 +139,15 @@ Feature: Bankaccount tests
       When i log in with username "customer" and password "welkom"
       And I edit the name of an account to "updated bankaccount name" and the type to current with the "wrong" Iban
       Then i get http code 401
+
+      # testing delete endpoint for employee
+  Scenario: Employee deletes bankaccount
+    When i log in with username "employee" and password "welkom"
+    And I get bankaccount by Iban "NL09INHO0722376752"
+    Then i get http code 200
+    And I get one Bankaccount object
+    Then I delete bankaccount with Iban "NL09INHO0722376752"
+    And i get http code 200
+    Then I get bankaccount by Iban "NL09INHO0722376752"
+    And i get http code 404
+    And Http message equals "IBAN not found!"
