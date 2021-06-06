@@ -112,6 +112,10 @@ public class DepositOrWithdraw   {
   public Double getAmount() {
     return amount;
   }
+  public Long getAmountLong(){
+    Double a = amount * 100;
+    return a.longValue();
+  }
 
   public void setAmount(Double amount) {
     this.amount = amount;

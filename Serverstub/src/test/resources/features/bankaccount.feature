@@ -66,40 +66,40 @@ Feature: Bankaccount tests
     And I create new Bankaccount "correct"
     Then I get one Bankaccount object
     And i get http code 201
-    When I make a "deposit" of 5000 to "new" account
+    When I make a "deposit" of 500 to "new" account
     Then i get http code 200
     Then I get bankaccount by generated Iban
     And I get one Bankaccount object
-    And The amount of new account is 50
+    And The amount of new account is 500
 
   Scenario: Employee creates a bankaccount, deposits and withdraws money
     When i log in with username "employee" and password "welkom"
     And I create new Bankaccount "correct"
     Then I get one Bankaccount object
     And i get http code 201
-    When I make a "deposit" of 5000 to "new" account
+    When I make a "deposit" of 500 to "new" account
     Then i get http code 200
     Then I get bankaccount by generated Iban
     And I get one Bankaccount object
-    And The amount of new account is 50
-    When I make a "withdraw" of 2500 to "new" account
+    And The amount of new account is 500
+    When I make a "withdraw" of 250 to "new" account
     Then i get http code 200
     Then I get bankaccount by generated Iban
     And I get one Bankaccount object
-    And The amount of new account is 25
+    And The amount of new account is 250
 
   Scenario: Employee withdraws to much money and gets account under limit
     When i log in with username "employee" and password "welkom"
     And I create new Bankaccount "correct"
     Then I get one Bankaccount object
     And i get http code 201
-    When I make a "withdraw" of 2500 to "new" account
+    When I make a "withdraw" of 250 to "new" account
     Then i get http code 400
     And Http message equals "Bank accounts cannot go under the limit"
 
   Scenario: Employee deposits to unknown Iban
     When i log in with username "employee" and password "welkom"
-    And I make a "deposit" of 5000 to "unknown" account
+    And I make a "deposit" of 500 to "unknown" account
     Then i get http code 404
     And Http message equals "IBAN not found!"
 
@@ -108,10 +108,10 @@ Feature: Bankaccount tests
     And I create new Bankaccount "savings"
     Then I get one Bankaccount object
     And i get http code 201
-    When I make a "deposit" of 5000 to "new" account
+    When I make a "deposit" of 500 to "new" account
     Then i get http code 400
     And Http message equals "You cannot Deposit or Withdraw to a savings account!"
-    When I make a "withdraw" of 2500 to "new" account
+    When I make a "withdraw" of 250 to "new" account
     Then i get http code 400
     And Http message equals "You cannot Deposit or Withdraw to a savings account!"
 
@@ -120,10 +120,10 @@ Feature: Bankaccount tests
     And I create new Bankaccount "correct"
     Then I get one Bankaccount object
     And i get http code 201
-    When I make a "deposit" of -5000 to "new" account
+    When I make a "deposit" of -500 to "new" account
     Then i get http code 400
     And Http message equals "Invalid amount"
-    When I make a "withdraw" of -2500 to "new" account
+    When I make a "withdraw" of -250 to "new" account
     Then i get http code 400
     And Http message equals "Invalid amount"
 

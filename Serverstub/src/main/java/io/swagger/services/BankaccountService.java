@@ -143,7 +143,7 @@ public class BankaccountService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userService.getUserByUsername(auth.getName());
         Transaction t = new Transaction();
-        t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmount().longValue()).performedBy(u);
+        t.ibANFrom("NL01INHO0000000001").ibANTo(body.getIBAN()).amount(body.getAmountLong()).performedBy(u);
         if (!getBankaccountByIBANSafe(body.getIBAN()).isPresent()) {
             throw new NotFoundException("IBAN not found!");
         }
