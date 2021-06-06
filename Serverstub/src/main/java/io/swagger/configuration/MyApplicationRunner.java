@@ -44,10 +44,11 @@ public class MyApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         Address address = initAddress();
         Limit l = initBankaccountLimit();
-        BankAccount bankAccount = initBankAccountCustomer(l);
+        BankAccount current = initBankAccountCustomer(l, "current");
+        BankAccount savings = initBankAccountCustomer(l, "savings");
 
 
-        User customer = initCustomerUser(address, bankAccount);
+        User customer = initCustomerUser(address, current, savings);
         User employee = initEmployeeUser(address);
         initMoreUsers(address);
 
@@ -64,7 +65,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         return addressRepository.save(address);
     }
 
-    private User initCustomerUser(Address address, BankAccount b) {
+    private User initCustomerUser(Address address, BankAccount b, BankAccount savings) {
         User customer = new User();
         customer.firstName("James").lastName("Dean").phoneNumber("0612345678")
                 .address(address).email("jamesdean@mail.com").addBankAccountsItem(b);
@@ -75,7 +76,9 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         userService.addUser(customer);
         b.setOwner(customer);
+        savings.setOwner(customer);
         bankAccountRepository.save(b);
+        bankAccountRepository.save(savings);
         return customer;
     }
 
@@ -117,10 +120,15 @@ public class MyApplicationRunner implements ApplicationRunner {
         return bankAccountRepository.save(bankAccount);
 
     }
-    private BankAccount initBankAccountCustomer(Limit limit){
+    private BankAccount initBankAccountCustomer(Limit limit, String type){
         BankAccount bankAccount = new BankAccount();
-        bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).IBAN(IbanHelper.generateIban())
-                .amount(300.00).name("James Daily Account").balanceMin(limit);
+        bankAccount.balanceMin(limit).amount(300.00);
+        if (type.equals("current")){
+            bankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT).name("James Daily Account").IBAN(IbanHelper.generateIban());
+        } else if (type.equals("savings")){
+            bankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS).name("James savings").IBAN("NL09INHO0722376752");
+        };
+
         return bankAccountRepository.save(bankAccount);
     }
     private void initTransactions(User customer){
