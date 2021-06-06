@@ -13,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,7 +50,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
 
         User customer = initCustomerUser(address, current, savings);
-        User employee = initEmployeeUser(address);
+        User employee = initEmployeeUser(address, initBankAccountCustomer(null, "current"));
         initMoreUsers(address);
 
         initBankAccount(l, customer);
@@ -82,16 +83,19 @@ public class MyApplicationRunner implements ApplicationRunner {
         return customer;
     }
 
-    private User initEmployeeUser(Address address) {
+    private User initEmployeeUser(Address address, BankAccount b) {
         User employee = new User();
         employee.firstName("Aubrey").lastName("Graham").phoneNumber("0612345678")
                 .address(address).email("aubreygraham@mail.com");
-        employee.setRoles(Collections.singletonList(Role.ROLE_EMPLOYEE));
+        employee.setRoles(Arrays.asList(Role.ROLE_CUSTOMER, Role.ROLE_EMPLOYEE));
 
         employee.setUsername("employee");
         employee.setPassword(passwordEncoder.encode("welkom"));
 
+        employee.addBankAccountsItem(b);
+
         userService.addUser(employee);
+        bankAccountRepository.save(b);
         return employee;
     }
 
