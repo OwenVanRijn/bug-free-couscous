@@ -8,14 +8,10 @@ Feature: User tests
     When i log in with username "tester123" and password "wrongpassword" and store the result
     Then i get http code 401
 
+#customer tests
+
   Scenario: Customer gets own information
     When i log in with username "customer" and password "welkom"
-    And I get own information
-    Then i get http code 200
-    And I get one UserDTO object
-
-  Scenario: Employee gets own information
-    When i log in with username "employee" and password "welkom"
     And I get own information
     Then i get http code 200
     And I get one UserDTO object
@@ -26,18 +22,31 @@ Feature: User tests
     Then i get http code 200
     And I get one UserDTO object
     And I get updated User "email", "newemail@mail.com"
-    
+
   Scenario: Customer edits phone number incorrectly
     When i log in with username "customer" and password "welkom"
     And I update own "phoneNumber" incorrectly
     Then i get http code 422
     And Http message equals "Not a valid phone number"
-  
+
   Scenario: Customer edits email incorrectly
     When i log in with username "customer" and password "welkom"
     And I update own "email" incorrectly
     Then i get http code 422
     And Http message equals "Not a valid email address"
+
+  Scenario: Customer tries to use employee function
+    When i log in with username "customer" and password "welkom"
+    And I get all users
+    Then i get http code 403
+
+#employee tests
+
+  Scenario: Employee gets own information
+    When i log in with username "employee" and password "welkom"
+    And I get own information
+    Then i get http code 200
+    And I get one UserDTO object
 
   Scenario: Employee gets all users
     When i log in with username "employee" and password "welkom"
